@@ -19,7 +19,11 @@
 typedef enum {
 	USERNAME,
 	PASSWORD,
-	LOGOUT
+	LOGOUT,
+	SHARE_LOCATION,
+	SAVE_LOCATION,
+	GET_OWNED,
+	GET_SHARED
 } RequestOpcode;
 
 typedef enum {
