@@ -31,6 +31,7 @@ typedef enum {
 	ERROR
 } ResponseStatus;
 
+//need review, minh gui username va password 1 the luon.
 typedef enum {
 	WAITING_USN,
 	WAITING_PASS,
