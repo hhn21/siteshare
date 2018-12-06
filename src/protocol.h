@@ -16,6 +16,9 @@
 #define FALSE            0
 #define BUFF_SIZE 		 255
 
+typedef RequestLengthType int
+typedef ResponseLengthType int
+
 typedef enum {
 	USERNAME,
 	PASSWORD,
@@ -45,22 +48,37 @@ typedef struct {
 
 typedef struct {
 	RequestOpcode opcode;
-	int length;
+	RequestLengthType length;
 	void *data;
 } Request;
 
 typedef struct {
 	ResponseStatus status;
-	int length;
+	ResponseLengthType length;
 	void *data;
 } Response;
 
+/* Make new request with NULL data */
+Request newRequest();
+
+/* Make new response with NULL data */
+Response newResponse();
+
+/* Bind socket to specific port and listen to connections
+ * params:
+ *      socket: socket file descriptor
+ *      port: port number
+ * returns:
+ *      1 if request succesfully
+ *      <= 0 value if has any error
+ */
 int listenOnPort(int socket, int port);
 
-/* Send a request to server through socket
+/* Send a request to server through socket and wait until receive response from server
  * params:
  *      socket: socket file descriptor
  *      request: request to send
+ *		response: response pointer to save server response
  * returns:
  *      1 if request succesfully
  *      <= 0 value if has any error
@@ -76,5 +94,15 @@ int request(int socket, Request request, Response *response);
  *      <= 0 value if has any error
  */
 int response(int socket, Response response);
+
+/* Receive a request from client through socket
+ * params:
+ *      socket: socket file descriptor
+ *      request: request pointer to save client request
+ * returns:
+ *      1 if request succesfully
+ *      <= 0 value if has any error
+ */
+int fetchRequest(int socket, Request *request);
 
 #endif
