@@ -13,10 +13,10 @@ typedef struct {
     char owner[ACC_NAME_MAX_LEN];			// name of owner of the location
     char sharedBy[ACC_NAME_MAX_LEN];		// name of account who shared location to owner
     time_t createdAt;		// created time
-    float lat;				// location coordinate
-    float lng;				// location coordinate
+    char category[100];     // location category
     char name[128];			// loction name
     char note[255];			// note
+    int seen;
 } Location;
 
 typedef struct {

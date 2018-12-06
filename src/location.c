@@ -127,8 +127,10 @@ void addLocationtoBook(LocationBook* book, Location *location){
  *		number of locations were read
  *		-1 if has any error while reading file
  */
-int importLocationFromFile(LocationBook* book, char *filename){
-	FILE *fpin = fopen(filename, "r");
+int importLocationOfUser(LocationBook* book, char *username){
+	char filePath[100];
+	sprintf(filePath, "%s/%s.txt", "data", username);
+	FILE *fpin = fopen(filePath, "r");
 	if(fpin == NULL){
 	    printf("Error! Unable to open %s!\n", filename);
 	    return -1;
@@ -137,20 +139,19 @@ int importLocationFromFile(LocationBook* book, char *filename){
     char owner[ACC_NAME_MAX_LEN];			// name of owner of the location
     char sharedBy[ACC_NAME_MAX_LEN];		// name of account who shared location to owner
     time_t createdAt;		// created time
-    float lat;				// location coordinate
-    float lng;				// location coordinate
+    char category[100];
     char name[128];			// loction name
     char note[255];			// note
+    int seen;
     int count = 0;
 
     Location *location;
-    while(!feof(fpin) && fscanf(fpin,"%s %s %ld %f %f %s %s\n", owner, sharedBy, (long*)&createdAt, &lat, &lng, name, note)){
+    while(!feof(fpin) && fscanf(fpin,"\"%s\" %ld \"%s\" \"%s\" \"%s\" %d\n", sharedBy, (long*)&createdAt, category, name, note, seen)){
 	    location = malloc(sizeof(Location));
-	    strcpy(location->owner, owner);
+	    strcpy(location->owner, username);
 	    strcpy(location->sharedBy, sharedBy);
 	    location->createdAt = createdAt;
-	    location->lat = lat;
-	    location->lng = lng;
+	    strcpy(location->category, category);
 	    strcpy(location->name, name);
 	    strcpy(location->note, note);
   		addLocationtoBook(book, location);
@@ -167,21 +168,24 @@ int importLocationFromFile(LocationBook* book, char *filename){
  *		book LocationBook
  *		filename string file name 
  */
-void saveLocationBookToFile(LocationBook* book, char *filename) {
+void saveLocationOfUser(LocationBook* book, char *username) {
 	BookRow *row;
 	ListNode *node1, *node2;
 	Location *l;
 
-	FILE *fpout = fopen(filename, "w");
+	char filePath[100];
+	sprintf(filePath, "%s/%s.txt", "data", username);
+	FILE *fpout = fopen(filePath, "w");
 	if(fpout == NULL){
-	    printf("Error! Unable to open %s!", filename);
+	    printf("Error! Unable to open %s!", filePath);
 	}
 	else {
 		listTraverse(node1, book->ownerList) {
+			if(strcmp(username, node1->key) != 0) continue;
 			row = (BookRow*)node1->data;
 			listTraverse(node2, row->data){
 				l = (Location*)node2->data;
-				fprintf(fpout, "%s %s %ld %f %f %s %s\n", l->owner, l->sharedBy, l->createdAt, l->lat, l->lng, l->name, l->note);
+				fprintf(fpout, "\"%s\" %ld \"%s\" \"%s\" \"%s\" %d\n", l->sharedBy, l->createdAt, l-category, l->name, l->note, l->seen);
 			}
 		}
 	}
