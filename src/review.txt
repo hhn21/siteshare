@@ -1,0 +1,3 @@
+protocol.h line 34, vì mình đã đổi thành gửi cả usn và pass 1 thể rồi nên cần sửa lại.
+location.h line 16,17. t đã bỏ lag và int và thêm int isRead.
+
