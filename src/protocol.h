@@ -16,8 +16,8 @@
 #define FALSE            0
 #define BUFF_SIZE 		 255
 
-typedef RequestLengthType int
-typedef ResponseLengthType int
+typedef int RequestLengthType;
+typedef int ResponseLengthType;
 
 typedef enum {
 	USERNAME,

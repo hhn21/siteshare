@@ -2,19 +2,22 @@ CFLAGS = -c -Wall
 CC = gcc
 LIBS =  -lm 
 
-all: server
+all: server client
 
-server: server.o account.o location.o sllist.o protocol.o
-	${CC} server.o account.o location.o sllist.o protocol.o -o server
+server: server.o account.o location.o sllist.o protocol.o util.o
+	${CC} server.o account.o location.o sllist.o protocol.o util.o -o server -pthread
 
-client: client.o protocol.o
-	${CC} client.o protocol.o -o client
+client: client.o account.o location.o sllist.o protocol.o util.o
+	${CC} client.o account.o location.o sllist.o protocol.o util.o -o client
 
 server.o: server.c
 	${CC} ${CFLAGS} server.c
 
 client.o: client.c
 	${CC} ${CFLAGS} client.c
+
+util.o: util.c
+	${CC} ${CFLAGS} util.c
 
 account.o: account.c
 	${CC} ${CFLAGS} account.c

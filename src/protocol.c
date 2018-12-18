@@ -35,11 +35,11 @@ int listenOnPort(int socket, int port){
 
 	// Bind socket to address
 	rs = bind(socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
-	if(rs <= 0) return rs;
+	if(rs < 0) return rs;
 
 	// Listen request from client
 	rs = listen(socket, BACKLOG);
-	if(rs <= 0) return rs;
+	if(rs < 0) return rs;
 
 	return 1;
 }
