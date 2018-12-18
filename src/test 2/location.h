@@ -81,7 +81,7 @@ void addLocationtoBook(LocationBook* book, Location *location);
  *		number of locations were read
  *		-1 if has any error while reading file
  */
-int importLocationOfUser(LocationBook* book, char *filename);
+int importLocationFromFile(LocationBook* book, char *filename);
 
 /*
  * save locations from LocationBook to file (1 location per line)
@@ -89,7 +89,7 @@ int importLocationOfUser(LocationBook* book, char *filename);
  *		book LocationBook
  *		filename string file name
  */
-void saveLocationOfUser(LocationBook* book, char *filename);
+void saveLocationBookToFile(LocationBook* book, char *filename);
 
 /*
  * free LocationBook from memory
