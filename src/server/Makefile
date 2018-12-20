@@ -4,17 +4,14 @@ LIBS =  -lm
 
 all: server
 
-server: server.o account.o location.o sllist.o protocol.o
-	${CC} server.o account.o location.o sllist.o protocol.o -o server
-
-client: client.o protocol.o
-	${CC} client.o protocol.o -o client
+server: server.o account.o location.o sllist.o protocol.o util.o
+	${CC} server.o account.o location.o sllist.o protocol.o util.o -o server -pthread
 
 server.o: server.c
 	${CC} ${CFLAGS} server.c
 
-client.o: client.c
-	${CC} ${CFLAGS} client.c
+util.o: util.c
+	${CC} ${CFLAGS} util.c
 
 account.o: account.c
 	${CC} ${CFLAGS} account.c

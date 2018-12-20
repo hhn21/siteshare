@@ -75,8 +75,9 @@ void deleteNode(List *list, ListNode *node){
 
     while(tmp != NULL) {
         if(tmp == node) {
-            if(prev != NULL) prev->next = tmp->next
-            free(tmp);  
+            if(prev != NULL) prev->next = tmp->next;
+            free(tmp);
+            break;
         }
         prev = tmp;
         tmp = tmp->next;
