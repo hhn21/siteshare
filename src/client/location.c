@@ -132,7 +132,7 @@ int importLocationOfUser(LocationBook* book, char *username){
 	sprintf(filename, "%s/%s.txt", "data", username);
 	FILE *fpin = fopen(filename, "r");
 	if(fpin == NULL){
-	    printf("Unable to open %s!\n", filename);
+	    printf("Error! Unable to open %s!\n", filename);
 	    return -1;
 	}
 
