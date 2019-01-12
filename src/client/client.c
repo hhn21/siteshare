@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 	
 	//Step 3: Request to connect server
 	if(connect(socketfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) < 0){
-		printf("\nError!Can not connect to sever! Client exit imediately! ");
+		printf("\nError!Can not connect to sever! Client exit imediately!\n\n");
 		return 0;
 	}
 

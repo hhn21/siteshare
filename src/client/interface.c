@@ -197,7 +197,7 @@ Option inputSignupCredentials(char username[], char password[]){
  */
 void printMainMenu(char username[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("Main menu (%s)\n", username);
+    printf("Main menu (logged in as %s)\n", username);
     printf("1. Add new location\n");
     printf("2. Share location\n");
     printf("3. Save to server\n");

@@ -127,7 +127,6 @@ void* handler(void *arg){
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
 			case LOGOUT:
-
 				break;
 			default:
 				break;
