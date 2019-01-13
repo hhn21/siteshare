@@ -8,14 +8,15 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <time.h>
 
 #include "util.h"
 #include "account.h"
 #include "location.h"
 #include "sllist.h"
 #include "protocol.h"
+#include "interface.h"
 
-#include "interface.c"
 
 int makeLoginDataBuff(char* username, char* password, char** buff) {
 	int buffSize;
@@ -58,12 +59,13 @@ int main(int argc, char** argv) {
 	}
 
 	//Step 4: Communicate with server
-	LocationBook *locationBook = newLocationBook();
+	LocationBook *locationBook;
+    SessionStatus sessionStatus = UNAUTHENTICATED;
 	char username[ACC_NAME_MAX_LEN];
     char password[ACC_NAME_MAX_LEN];
     char *buff = NULL;
     int buffSize;
-    // Location l;
+    Location *location;
     FILE *fptr;
     char filePath[100];
 
@@ -86,7 +88,9 @@ int main(int argc, char** argv) {
             	request(socketfd, req, &res);
             	if (res.status == SUCCESS) {
 					printf("Login succeeded\n");
+                    sessionStatus = LOGGED_IN;
 					opt = IOPT_MAINMENU;
+                    locationBook = newLocationBook();
 					if(importLocationOfUser(locationBook, username) < 0) {
                         printf("Creating new data store ...\n");
                         sprintf(filePath, "./data/%s.txt", username);
@@ -112,17 +116,52 @@ int main(int argc, char** argv) {
 					printf("Signup succeeded! Now you can login to system\n");
 					opt = IOPT_WELCOME;
             	} else {
-            		printf("Username is existed\n");
+            		printf("Signed up failed\n");
             		opt = IOPT_SIGNUP;
             	}
+                free(buff);
+                buff = NULL;
             	break;
-            case IOPT_LOGOUT: 
-            	printf("log out\n"); 
+            case IOPT_LOGOUT:
+                if(sessionStatus != LOGGED_IN) {
+                    printf("You are not logged in yet!\n");
+                    break;
+                }
+                buff = NULL;
+                req.opcode = LOGOUT;
+                req.length = buffSize;
+                req.data = buff;
+                request(socketfd, req, &res);
+                if (res.status == SUCCESS) {
+                    printf("Logout succeeded\n");
+                    opt = IOPT_WELCOME;
+                    destroyLocationBook(locationBook);
+                    sessionStatus = UNAUTHENTICATED;
+                } else {
+                    printf("Logout failed\n");
+                    opt = IOPT_SIGNUP;
+                }
             	break;
             case IOPT_EXIT:
             	break;
             case IOPT_ADD: 
-            	printf("add\n"); 
+                if(sessionStatus != LOGGED_IN) {
+                    printf("You are not logged in yet!\n");
+                    opt = IOPT_WELCOME; 
+                    break;
+                }
+                // create location
+                location = malloc(sizeof(Location));
+                inputLocationInfo(location);
+                strcpy(location->owner, username);
+                strcpy(location->sharedBy, "\0");
+                location->createdAt = time(NULL);
+                location->seen = 1;
+                // add location to in-memory book
+                addLocationtoBook(locationBook, location);
+                // save location to db
+                addNewLocationOfUser(location, username);
+                opt = IOPT_MAINMENU;
             	break;
             case IOPT_SHARE: 
             	printf("share\n"); 

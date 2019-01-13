@@ -1,22 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define OPT_MAX_LEN 50
-
-typedef enum {
-    IOPT_WELCOME, //welcome screen, see printLoginMenu()
-    IOPT_MAINMENU, // home screen, see print Main menu
-    IOPT_ADD,
-    IOPT_SHARE,
-    IOPT_SAVE,
-    IOPT_RESTORE,
-    IOPT_FETCH,
-    IOPT_LOGIN,
-    IOPT_SIGNUP,
-    IOPT_LOGOUT,
-    IOPT_EXIT
-} Option;
+#include "interface.h"
 
 /* used in loginMenu()
  * Print out the welcome screen
@@ -62,7 +44,8 @@ Option loginMenu(){
     int opt = 0;
     do {
         printWelcomeScreen();
-        fgets(buf, OPT_MAX_LEN-1, stdin);
+        scanf("%[^\n]%*c", buf);
+        buf[strlen(buf)] = '\0';
         opt = atoi(buf);
         if (buf[0] == '\n') {
             printf("~ You input nothing, if u wish to exit, please choose 3\n");
@@ -92,15 +75,15 @@ Option inputLoginCredentials(char* username, char* password){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("(login screen)\n");
     printf("User name: ");
-    fgets(username, ACC_NAME_MAX_LEN-1, stdin);
-    username[strlen(username) - 1] = '\0';
+    scanf("%[^\n]%*c", username);
+    username[strlen(username)] = '\0';
     if (username[0] == '\0') {
         printf("You input nothing, which means back\n");
         return IOPT_WELCOME;
     }
     printf("Password : ");
-    fgets(password, ACC_NAME_MAX_LEN-1, stdin);
-    password[strlen(password) - 1] = '\0';
+    scanf("%[^\n]%*c", password);
+    password[strlen(password)] = '\0';
     if (password[0] == '\0') {
         printf("You input nothing, which means back\n");
         return IOPT_WELCOME;
@@ -121,15 +104,15 @@ Option inputSignupCredentials(char username[], char password[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("(sign up screen)\n");
     printf("User name: ");
-    fgets(username, ACC_NAME_MAX_LEN - 1, stdin);
-    username[strlen(username) - 1] = '\0';
+    scanf("%[^\n]%*c", username);
+    username[strlen(username)] = '\0';
     if (username[0] == '\0') {
         printf("You input nothing, which means back\n");
         return IOPT_WELCOME;
     }
     printf("Password : ");
-    fgets(password, ACC_NAME_MAX_LEN - 1, stdin);
-    password[strlen(password) - 1] = '\0';
+    scanf("%[^\n]%*c", password);
+    password[strlen(password)] = '\0';
     if (password[0] == '\0') {
         printf("You input nothing, which means back\n");
         return IOPT_WELCOME;
@@ -137,57 +120,50 @@ Option inputSignupCredentials(char username[], char password[]){
     return IOPT_SIGNUP;
 }
 
+void printCategoryList() {
+    const int CATEGORY_COUNT = 7;
+    const char *categories[] = {
+        "Building",
+        "Restaurent",
+        "Shop",
+        "Street",
+        "Lake",
+        "River",
+        "Park"
+    };
+    printf("(Ex: ");
+    for(int i = 0; i < CATEGORY_COUNT; i++) {
+        printf("%s, ", categories[i]);
+    }
+    printf("...)\n");
+}
 
-// /* case: IOPT_ADD
-//  * save new location to local file
-//  * Params:
-//  *  char username[]
-//  *
-//  * Return: Option
-//  *  IOPT_WELCOME (if not logged in yet)
-//  *  IOPT_MAINMENU (if succeed)
-//  */
-// Option addLocation(char username[]){
-//     if (!strcmp(username,""))
-//     {
-//         printf("~ You need to login first\n");
-//         return IOPT_WELCOME;
-//     }
-//     Location newlocation;
-//     strcpy(newlocation.owner, username);
-//     strcpy(newlocation.sharedBy, username);
+/* case: IOPT_ADD
+ * input location info
+ * Params:
+ *  char username[]
+ *
+ * Return: Option
+ *  IOPT_WELCOME (if not logged in yet)
+ *  IOPT_MAINMENU (if succeed)
+ */
+Option inputLocationInfo(Location *location){
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("(add location form)\n");
+    printf("Input Category. ");
+    printCategoryList();
+    printf("Location Category: ");
+    scanf("%[^\n]%*c", location->category);
+    location->category[strlen(location->category)] = '\0';
+    printf("Location Name: ");
+    scanf("%[^\n]%*c", location->name);
+    location->name[strlen(location->name)] = '\0';
+    printf("Location Note: ");
+    scanf("%[^\n]%*c", location->note);
+    location->note[strlen(location->note)] = '\0';
 
-//     // time_t createdAt;       // created time
-//     char category[100];     // location category
-//     char name[128];         // loction name
-//     char note[255];         // note
-//     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-//     printf("(add location form)\n");
-//     printf("User name: ");
-//     fgets(username, ACC_NAME_MAX_LEN-1, stdin);
-//     username[strlen(username)-1]='\0';
-//     if (username[0]=='\0')
-//     {
-//         printf("You input nothing, which means back\n");
-//         return IOPT_WELCOME;
-//     }
-//     printf("Password : ");
-//     fgets(password, ACC_NAME_MAX_LEN-1, stdin);
-//     password[strlen(password)-1]='\0';
-//     if (password[0]=='\0')
-//     {
-//         printf("You input nothing, which means back\n");
-//         return IOPT_WELCOME;
-//     }
-//     //use switch case is better, set return value for the account search
-//     if (0)
-//     {
-//         printf("\n~ User name already exist.\n");
-//         return IOPT_WELCOME;
-//     }
-//     printf("Login succeeded\n");
-//     return IOPT_MAINMENU;
-// }
+    return IOPT_WELCOME;
+}
 
 /* Print our the login menu
  * Params:
@@ -218,12 +194,14 @@ void printMainMenu(char username[]){
 Option mainMenu(char username[]){
     char buf[OPT_MAX_LEN];
     int opt = 0;
-    do{
+    do {
         printMainMenu(username);
-        scanf("%s", buf);
+        scanf("%[^\n]%*c", buf);
+        buf[strlen(buf)] = '\0';
         opt = atoi(buf);
-    }while(opt<1 || opt >6);
-    switch(opt){
+    } while (opt < 1 || opt > 6);
+
+    switch(opt) {
         case 1: return IOPT_ADD;
         case 2: return IOPT_SHARE;
         case 3: return IOPT_SAVE;

@@ -167,6 +167,25 @@ int importLocationOfUser(LocationBook* book, char *username){
  *		book LocationBook
  *		username string
  */
+void addNewLocationOfUser(Location *l, char *username) {
+	char filename[100];
+	sprintf(filename, "%s/%s.txt", "data", username);
+	FILE *fpout = fopen(filename, "a");
+	if(fpout == NULL){
+	    printf("Error! Unable to open %s!", filename);
+	}
+	else {
+		fprintf(fpout, "\"%s\" %ld \"%s\" \"%s\" \"%s\" %d\n", l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+	}
+	fclose(fpout);
+}
+
+/* 
+ * save locations from LocationBook to file (1 location per line)
+ * params: 
+ *		book LocationBook
+ *		username string
+ */
 void saveLocationOfUser(LocationBook* book, char *username) {
 	BookRow *row;
 	ListNode *node1, *node2;
