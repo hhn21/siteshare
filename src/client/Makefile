@@ -4,8 +4,8 @@ LIBS =  -lm
 
 all: client
 
-client: client.o account.o location.o sllist.o protocol.o util.o
-	${CC} client.o account.o location.o sllist.o protocol.o util.o -o client
+client: client.o account.o location.o sllist.o protocol.o util.o interface.o
+	${CC} client.o account.o location.o sllist.o protocol.o util.o interface.o -o client
 
 client.o: client.c
 	${CC} ${CFLAGS} client.c
@@ -25,7 +25,9 @@ sllist.o: sllist.c
 protocol.o: protocol.c
 	${CC} ${CFLAGS} protocol.c
 
+interface.o: interface.c
+	${CC} ${CFLAGS} interface.c
+
 clean:
 	rm -f *.o *~
 	rm client
-	rm server

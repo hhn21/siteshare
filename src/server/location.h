@@ -73,26 +73,35 @@ List* getLocationsBySharer(LocationBook* book, char* sharedBy);
  * - Location List indexed by sharer name
  * - NULL if not found
  */
-void addLocationtoBook(LocationBook* book, Location *location);
+void addLocationtoBook(LocationBook* book, Location location);
 
 /*
  * import location data from file to a location book
  * params:
  *		book LocationBook
- *		filename string
+ *		username string
  * return:
  *		number of locations were read
  *		-1 if has any error while reading file
  */
-int importLocationOfUser(LocationBook* book, char *filename);
+int importLocationOfUser(LocationBook* book, char *username);
+
+/*
+ * add 1 location to the end of db file
+ * params:
+ *      location Location
+ *      username string
+ *      
+ */
+void addNewLocationOfUser(Location location, char *username);
 
 /*
  * save locations from LocationBook to file (1 location per line)
  * params:
  *		book LocationBook
- *		filename string file name
+ *		username string
  */
-void saveLocationOfUser(LocationBook* book, char *filename);
+void saveLocationOfUser(LocationBook* book, char *username);
 
 /*
  * free LocationBook from memory
