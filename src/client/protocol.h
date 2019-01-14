@@ -26,7 +26,8 @@ typedef enum {
 	SHARE_LOCATION,
 	SAVE_LOCATION,
 	GET_OWNED,
-	GET_SHARED
+	GET_SHARED,
+	FETCH			//fetch new location when user log in
 } RequestOpcode;
 
 typedef enum {

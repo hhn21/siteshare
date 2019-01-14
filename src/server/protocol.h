@@ -26,7 +26,8 @@ typedef enum {
 	SHARE_LOCATION,
 	SAVE_LOCATION,
 	GET_OWNED,
-	GET_SHARED
+	GET_SHARED,
+	FETCH			//fetch new location when user log in
 } RequestOpcode;
 
 typedef enum {
@@ -34,7 +35,6 @@ typedef enum {
 	ERROR
 } ResponseStatus;
 
-//need review, minh gui username va password 1 the luon.
 typedef enum {
 	UNAUTHENTICATED,
 	LOGGED_IN
@@ -42,6 +42,7 @@ typedef enum {
 
 typedef struct {
 	int fd;    				// client socket descriptor
+	Account user;			// identify the user in the session
 	SessionStatus status;	// Session status
 } Session;
 
