@@ -44,8 +44,6 @@ Option loginMenu(){
     int opt = 0;
     do {
         printWelcomeScreen();
-        // memset(buf,'\0',strlen(buf)+1);
-        // scanf("%[^\n]%*c", buf);
         fgets(buf, OPT_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
 
@@ -78,8 +76,6 @@ Option inputLoginCredentials(char* username, char* password){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("(login screen)\n");
     printf("User name: ");
-    // memset(username,'\0',strlen(username)+1);
-    // scanf("%[^\n]%*c", username);
     fgets(username, ACC_NAME_MAX_LEN, stdin);
     username[strlen(username) - 1] = '\0';
     if (username[0] == '\0') {
@@ -87,8 +83,6 @@ Option inputLoginCredentials(char* username, char* password){
         return IOPT_WELCOME;
     }
     printf("Password : ");
-    // memset(password,'\0',strlen(password)+1);
-    // scanf("%[^\n]%*c", password);
     fgets(password, ACC_NAME_MAX_LEN, stdin);
     password[strlen(password) - 1] = '\0';
     if (password[0] == '\0') {
@@ -111,8 +105,6 @@ Option inputSignupCredentials(char username[], char password[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("(sign up screen)\n");
     printf("User name: ");
-    // scanf("%[^\n]%*c", username);
-    // username[strlen(username)] = '\0';
     fgets(username, ACC_NAME_MAX_LEN, stdin);
     username[strlen(username) - 1] = '\0';
     if (username[0] == '\0') {
@@ -120,8 +112,6 @@ Option inputSignupCredentials(char username[], char password[]){
         return IOPT_WELCOME;
     }
     printf("Password : ");
-    // scanf("%[^\n]%*c", password);
-    // password[strlen(password)] = '\0';
     fgets(password, ACC_NAME_MAX_LEN, stdin);
     password[strlen(password) - 1] = '\0';
     if (password[0] == '\0') {
@@ -160,24 +150,30 @@ void printCategoryList() {
  */
 Option inputLocationInfo(Location *location){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("(add location form)\n");
+    printf("(Add location form. Note: Leave a blank input if you want to quit)\n");
     printf("Input Category. ");
     printCategoryList();
     printf("Location Category: ");
-    // scanf("%[^\n]%*c", location->category);
-    // location->category[strlen(location->category)] = '\0';
     fgets(location->category, L_CAT_MAX_LEN, stdin);
     location->category[strlen(location->category) - 1] = '\0';
+    if (location->category[0] == '\0') {
+        printf("You input nothing, which means back\n");
+        return IOPT_WELCOME;
+    }
     printf("Location Name: ");
-    // scanf("%[^\n]%*c", location->name);
-    // location->name[strlen(location->name)] = '\0';
     fgets(location->name, L_NAME_MAX_LEN, stdin);
     location->name[strlen(location->name) - 1] = '\0';
+    if (location->name[0] == '\0') {
+        printf("You input nothing, which means back\n");
+        return IOPT_WELCOME;
+    }
     printf("Location Note: ");
-    // scanf("%[^\n]%*c", location->note);
-    // location->note[strlen(location->note)] = '\0';
     fgets(location->note, L_NOTE_NAME_MAX_LEN, stdin);
     location->note[strlen(location->note) - 1] = '\0';
+    if (location->note[0] == '\0') {
+        printf("You input nothing, which means back\n");
+        return IOPT_WELCOME;
+    }
 
     return IOPT_WELCOME;
 }
@@ -215,8 +211,6 @@ Option mainMenu(char username[]){
         printMainMenu(username);
         fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
-        // scanf("%[^\n]%*c", buf);
-        // buf[strlen(buf)] = '\0';
         opt = atoi(buf);
     } while (opt < 1 || opt > 6);
 
@@ -231,31 +225,37 @@ Option mainMenu(char username[]){
     return IOPT_EXIT;
 }
 
-/* case: IOPT_SIGNUP
- * take username and password from user
+/* Input receiver
  * Params:
- *  char username[]
- *  char password[]
- * Return: Option
- *  IOPT_WELCOME (if wrong username already exist or input nothing)
- *  IOPT_MAINMENU (if succeed)
+ *      receiver 
+ * Return:
+ *      IOPT_MAINMENU if user input nothing
+ *      IOPT_SHARE otherwise
  */
 Option inputSharingReceiver(char *receiver){
     printf("Receiver (username): ");
-    // scanf("%[^\n]%*c", receiver);
-    // username[strlen(username)] = '\0';
     fgets(receiver, ACC_NAME_MAX_LEN, stdin);
     receiver[strlen(receiver) - 1] = '\0';
     if (receiver[0] == '\0') {
         printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+        return IOPT_MAINMENU;
     }
     return IOPT_SHARE;
 }
 
+/* Print out locations of an user an let user select 1
+ * Params:
+ *      book LocationBook
+ *      username current user to select location
+ *      location location pointer to save selected location
+ * Return:
+ *      IOPT_MAINMENU if user input nothing
+ *      IOPT_SHARE otherwise
+ */
 Option selectLocationToShare(LocationBook *book, char *username, Location **location) {
     BookRow *row;
     ListNode *node1, *node2;
+    ListNode tmp;
     Location *l;
     Location *l_a[10];
     int j = 0;
@@ -263,34 +263,70 @@ Option selectLocationToShare(LocationBook *book, char *username, Location **loca
     struct tm* tm_info;
     char buf[OPT_MAX_LEN];
     int opt = 0;
+    int currPage = 1;
+    int printPageInfo;
 
     listTraverse(node1, book->ownerList) {
         row = (BookRow*)node1->data;
         if(strcmp(username, row->key) != 0) continue;
-        printf("%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
+        printf("\n\n%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
         listTraverse(node2, row->data){
             l = (Location*)node2->data;
             l_a[j] = l;
-            j++;
+            j = j % 10 + 1;
             tm_info = localtime(&(l->createdAt));
             strftime(timeString, 26, "%Y-%m-%d %H:%M:%S", tm_info);
             printf("%-5d %-20s %-30s %-30s %-50s\n", j, timeString, l->category, l->name, l->note);
+            printPageInfo = 1;
             if(j % 10 == 0 || node2->next == NULL) { // if reach the end of page or the end of list 
                 do {
-                    printf("Choose location(1-10), '\\n' to next page, enter to quit: ");
-                    // scanf("%[^\n]%*c", buf);
-                    // buf[strlen(buf)] = '\0';
+                    if(printPageInfo == 1) {
+                        printf("\nPage %d \t", currPage);
+                        if(currPage > 1) printf("Type '\\p' to prev page, ");
+                        if(node2->next != NULL) printf("Type '\\n' to next page");
+                    }
+                    printf("\n\nChoose location (1-%d), enter to quit: ", j);
                     fgets(buf, OPT_MAX_LEN, stdin);
                     buf[strlen(buf) - 1] = '\0';
-                    if(strcmp(buf, "\\n") == 0) break;
+
+                    // if inputed "\p"
+                    if(strcmp(buf, "\\p") == 0) {
+                        if(currPage == 1) {
+                            printf("Error. No previous page!\n");
+                            continue;
+                        }
+                        // go back to previous page
+                        currPage -= 1;
+                        tmp.next = row->data->root;
+                        node2 = &tmp;
+                        for(int i = 0; i < (currPage - 1) * 10; i++) node2 = node2->next;
+                        j = 0;
+                        break;
+                    }
+
+                    // if inputed "\n"
+                    if(strcmp(buf, "\\n") == 0) {
+                        if(node2->next == NULL) {
+                            printf("Error. Reached the end of result!\n");
+                            continue;
+                        }
+                        currPage += 1;
+                        printf("\n\n%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
+                        break;
+                    }
+
+                    // if inputed "\0" (blank)
                     if(buf[0] == '\0') {
                         printf("You input nothing, which means back\n");
                         *location = NULL;
-                        return IOPT_WELCOME;
+                        return IOPT_MAINMENU;
                     }
+
+                    // else
                     opt = atoi(buf);
-                    if(opt < 1 || opt > 10) {
+                    if(opt < 1 || opt > j) {
                         printf("Invalid input, please try again\n");
+                        printPageInfo = 0;
                         continue;
                     }
                     *location = l_a[opt];

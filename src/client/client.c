@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME;
                     break;
                 }
-                buff = NULL;
+                buff = "";
                 req.opcode = LOGOUT;
                 req.length = buffSize;
                 req.data = buff;
@@ -154,11 +154,13 @@ int main(int argc, char** argv) {
                     printf("~ Logout succeeded\n");
                     opt = IOPT_WELCOME;
                     destroyLocationBook(locationBook);
+                    locationBook = NULL;
                     sessionStatus = UNAUTHENTICATED;
                 } else {
                     printf("~ Logout failed\n");
-                    opt = IOPT_SIGNUP;
+                    opt = IOPT_MAINMENU;
                 }
+                buff = NULL;
             	break;
             case IOPT_EXIT:
             	break;
@@ -170,7 +172,12 @@ int main(int argc, char** argv) {
                 }
                 // create location
                 location = malloc(sizeof(Location));
-                inputLocationInfo(location);
+                opt = inputLocationInfo(location);
+                if(opt == IOPT_MAINMENU) {
+                    free(location);
+                    location = NULL;
+                    break;
+                }
                 strcpy(location->owner, username);
                 strcpy(location->sharedBy, "\0");
                 location->createdAt = time(NULL);
@@ -222,9 +229,11 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME;
                     break;
                 }
-                buff = username;
+                printf("~ fetching unseen locations ...\n");
+                buff = malloc(strlen(username) + 1);
+                strcpy(buff, username);
                 req.opcode = FETCH;
-                req.length = strlen(buff) + 2;
+                req.length = strlen(username) + 1;
                 req.data = buff;
                 request(socketfd, req, &res);
                 if (res.status == SUCCESS) {
@@ -235,6 +244,9 @@ int main(int argc, char** argv) {
                     printf("~ No new location\n");
                     opt = IOPT_MAINMENU;
                 }
+                opt = IOPT_MAINMENU;
+                free(buff);
+                buff = NULL;
                 break;
                 //request tren server
                 //hien thi cho nguoi dung 10 thong bao 1

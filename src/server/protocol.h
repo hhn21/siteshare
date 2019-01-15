@@ -46,7 +46,6 @@ typedef struct {
 	int fd;    				// client socket descriptor
 	Account user;			// identify the user in the session
 	SessionStatus status;	// Session status
-	Account user;			// current user
 } Session;
 
 typedef struct {

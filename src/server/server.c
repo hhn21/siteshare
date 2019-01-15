@@ -136,9 +136,6 @@ int fetch(Session *session, char* username){
 	if(session->status == UNAUTHENTICATED) return 0;
 
 	//find the user's file
-	LocationBook* book = NULL;
-	int rs = importLocationOfUser(book, username);
-	if (rs < 0) return 0;
 	return 1;
 
 	//TODO: find the list that is not seen
@@ -181,6 +178,7 @@ void* handler(void *arg){
 				} else  { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			case LOGOUT:
 				rs = logout(session);
 				if(rs) { 
@@ -196,6 +194,7 @@ void* handler(void *arg){
 				} else { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			case FETCH:
 				rs = fetch(session, req.data);
 				if(rs) { 
