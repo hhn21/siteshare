@@ -7,8 +7,8 @@ I. Welcome screen:
 	2. Signup:
 		a. Không ấn gì, enter =>back
 		b. a, không gì => back
-		
-	3. Exit:
+		c. a, cái gì ở đây cũng được => tài khoản đã tồn tại
+	3. Exit: => exit
 II. Main menu screen:
 	1. add location
 	2. share location

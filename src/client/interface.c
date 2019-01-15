@@ -125,7 +125,7 @@ void printCategoryList() {
     const int CATEGORY_COUNT = 7;
     const char *categories[] = {
         "Building",
-        "Restaurent",
+        "Restaurant",
         "Shop",
         "Street",
         "Lake",

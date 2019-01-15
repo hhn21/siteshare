@@ -294,7 +294,7 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME;
                     break;
                 }
-                printf("~ fetching unseen locations ...\n");
+                printf("\n~ fetching unseen locations ...\n");
                 buff = malloc(strlen(username) + 1);
                 strcpy(buff, username);
                 req.opcode = FETCH;
