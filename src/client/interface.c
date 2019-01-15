@@ -332,7 +332,7 @@ Option selectLocationToShare(LocationBook *book, char *username, Location **loca
                     printPageInfo = 0;
                     continue;
                 }
-                *location = l_a[opt];
+                *location = l_a[opt - 1];
                 return IOPT_SHARE;
             } while (1);
         }
