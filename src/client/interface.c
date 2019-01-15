@@ -1,11 +1,7 @@
 #include "interface.h"
 
-/* used in loginMenu()
+/* used in welcomeMenu()
  * Print out the welcome screen
- * Params:
- *
- * Return:
- *
  */
 void printWelcomeScreen(){
     int r = rand()%8 + 1;
@@ -31,15 +27,12 @@ void printWelcomeScreen(){
 
 /* case: IOPT_WELCOME
  * a welcome screen, user choose login, sign up or exit
- * Params:
- *
- * Return: Option
- *  IOPT_LOGIN
- *  IOPT_SIGNUP
- *  IOPT_EXIT
- *
+ *  Return: Option
+ *      IOPT_LOGIN
+ *      IOPT_SIGNUP
+ *      IOPT_EXIT
  */
-Option loginMenu(){
+Option welcomeMenu(){
     char buf[OPT_MAX_LEN];
     int opt = 0;
     do {
@@ -65,12 +58,12 @@ Option loginMenu(){
 
 /* case: IOPT_LOGIN
  * take username and password from user, check Auth()
- * Params:
- *  char username[]
- *  char password[]
- * Return: Option
- *  IOPT_WELCOME (if wrong username or password or input nothing)
- *  IOPT_MAINMENU (if succeed)
+ *  Params:
+ *      char username[]
+ *      char password[]
+ *  Return: Option
+ *      IOPT_WELCOME (if wrong username or password or input nothing)
+ *      IOPT_MAINMENU (if succeed)
  */
 Option inputLoginCredentials(char* username, char* password){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -94,12 +87,12 @@ Option inputLoginCredentials(char* username, char* password){
 
 /* case: IOPT_SIGNUP
  * take username and password from user
- * Params:
- *  char username[]
- *  char password[]
- * Return: Option
- *  IOPT_WELCOME (if wrong username already exist or input nothing)
- *  IOPT_MAINMENU (if succeed)
+ *  Params:
+ *      char username[]
+ *      char password[]
+ *  Return: Option
+ *      IOPT_WELCOME (if wrong username already exist or input nothing)
+ *      IOPT_MAINMENU (if succeed)
  */
 Option inputSignupCredentials(char username[], char password[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -121,6 +114,9 @@ Option inputSignupCredentials(char username[], char password[]){
     return IOPT_SIGNUP;
 }
 
+/*
+ * used in inputLocationInfo
+ */
 void printCategoryList() {
     const int CATEGORY_COUNT = 7;
     const char *categories[] = {
@@ -141,12 +137,12 @@ void printCategoryList() {
 
 /* case: IOPT_ADD
  * input location info
- * Params:
- *  char username[]
+ *  Params:
+ *      char username[]
  *
- * Return: Option
- *  IOPT_WELCOME (if not logged in yet)
- *  IOPT_MAINMENU (if succeed)
+ *  Return: Option
+ *      IOPT_WELCOME (if not logged in yet)
+ *      IOPT_MAINMENU (if succeed)
  */
 Option inputLocationInfo(Location *location){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -178,11 +174,9 @@ Option inputLocationInfo(Location *location){
     return IOPT_ADD;
 }
 
-/* Print our the login menu
- * Params:
- *
- * Return:
- *
+/* Print our the main menu
+ *  Params:
+ *      username
  */
 void printMainMenu(char username[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -276,14 +270,14 @@ Option selectLocationToShare(LocationBook *book, char *username, Location **loca
         return IOPT_MAINMENU;
     }
     
-    printf("\n\n%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
+    printf("\n%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
     listTraverse(node2, locations){
         l = (Location*)node2->data;
         l_a[j] = l;
         j = j % 10 + 1;
         tm_info = localtime(&(l->createdAt));
         strftime(timeString, 26, "%Y-%m-%d %H:%M:%S", tm_info);
-        printf("%-5d %-20s %-30s %-30s %-50s\n", j, timeString, l->category, l->name, l->note);
+        printf("%-5d %-20s %-30s %-30s %-50s \n", j, timeString, l->category, l->name, l->note);
         printPageInfo = 1;
         if(j % 10 == 0 || node2->next == NULL) { // if reach the end of page or the end of list 
             do {

@@ -10,7 +10,12 @@ I. Welcome screen:
 		c. a, cái gì ở đây cũng được => tài khoản đã tồn tại
 	3. Exit: => exit
 II. Main menu screen:
-	1. add location
+	1. add location:
+		a. Không ấn gì, enter =>back
+		b. Shop, không gì => back
+		c. Shop, Sivi Mart, không gì => back
+		d. Shop, Sivi Mart, chỗ này rẻ, không gì => back
+		d. Shop, Sivi Mart, chỗ này rẻ, anhk => 
 	2. share location
 	3. 
 

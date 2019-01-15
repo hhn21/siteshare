@@ -17,21 +17,23 @@
 #include "sllist.h"
 #include "protocol.h"
 
-List *accountList;
-LocationBook *locationBook;
-List *clientSessionList;
+List *accountList;			//list of account
+LocationBook *locationBook;	//TODO: ??
+List *clientSessionList;	//TODO: ??
 
-pthread_mutex_t accountListMutex;
-pthread_mutex_t clientSessionMutex;
-pthread_mutex_t locationBookMutex;
-pthread_mutex_t locationDBMutex;
+//TODO
+pthread_mutex_t accountListMutex;	//TODO
+pthread_mutex_t clientSessionMutex;	//TODO
+pthread_mutex_t locationBookMutex;	//TODO
+pthread_mutex_t locationDBMutex;	//TODO
 
 /* try to authenticate a client credentials
  * params:
  *		credentials: "username\npassword" form string
  * return:
- *		0 if authentication fail
- *		1 if authentication success
+ *	0 if account does not exist
+ *	1 if authentication success
+ *	2 if incorrect password
  */
 int authenticate(Session *session, char* credentials) {
 	char username[ACC_NAME_MAX_LEN];
@@ -189,8 +191,8 @@ void* handler(void *arg){
 	pthread_mutex_unlock(&clientSessionMutex);
 
 	// communicate with client
-	Request req;
-	Response res;
+	Request req;	//request from user, includes: opcode, length, data
+	Response res;	//response message to client, includes: status, length, data
 	int rs;			//result, determind what to send back to user
 
 	Location locationArr[PAGE_SIZE];
