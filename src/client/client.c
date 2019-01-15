@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
             case IOPT_WELCOME: opt = loginMenu(); break;
             case IOPT_MAINMENU: 
                 if(sessionStatus != LOGGED_IN) {
-                    printf("~ You are not logged in yet!\n");
+                    printf("\n~ You are not logged in yet!\n");
                     opt = IOPT_WELCOME;
                     break;
                 }
@@ -104,19 +104,19 @@ int main(int argc, char** argv) {
             	req.data = buff;
             	request(socketfd, req, &res);
             	if (res.status == SUCCESS) {
-					printf("~ Login succeeded\n");
+					printf("\n~ Login succeeded\n");
                     sessionStatus = LOGGED_IN;
 					opt = IOPT_FETCH;
                     locationBook = newLocationBook();
 					if(importLocationOfUser(locationBook, username) < 0) {
-                        printf("~ Creating new data store ...\n");
+                        printf("\n~ Creating new data store ...\n");
                         sprintf(filePath, "./data/%s.txt", username);
                         fptr = fopen(filePath, "w");
                         fclose(fptr);
                     }
             	} else {
-            		printf("~ Your credentials does not match our record\n");
-            		opt = IOPT_WELCOME;
+                    printf("%s\n", (char*)res.data);
+            		opt = IOPT_LOGIN;
             	}
             	free(buff);
             	buff = NULL;
@@ -130,10 +130,10 @@ int main(int argc, char** argv) {
             	req.data = buff;
             	request(socketfd, req, &res);
             	if (res.status == SUCCESS) {
-					printf("~ Signup succeeded! Now you can login to system\n");
+					printf("\n~ Signup succeeded! Now you can login to system\n");
 					opt = IOPT_WELCOME;
             	} else {
-            		printf("~ Signed up failed\n");
+                    printf("\n~ Signup failed! Username already exists\n");
             		opt = IOPT_SIGNUP;
             	}
                 free(buff);
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
             	break;
             case IOPT_LOGOUT:
                 if(sessionStatus != LOGGED_IN) {
-                    printf("~ You are not logged in yet!\n");
+                    printf("\n~ You are not logged in yet!\n");
                     opt = IOPT_WELCOME;
                     break;
                 }
@@ -151,12 +151,12 @@ int main(int argc, char** argv) {
                 req.data = buff;
                 request(socketfd, req, &res);
                 if (res.status == SUCCESS) {
-                    printf("~ Logout succeeded\n");
+                    printf("\n~ Logout succeeded\n");
                     opt = IOPT_WELCOME;
                     destroyLocationBook(locationBook);
                     sessionStatus = UNAUTHENTICATED;
                 } else {
-                    printf("~ Logout failed\n");
+                    printf("\n~ Logout failed\n");
                     opt = IOPT_SIGNUP;
                 }
             	break;
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
             	break;
             case IOPT_ADD: 
                 if(sessionStatus != LOGGED_IN) {
-                    printf("~ You are not logged in yet!\n");
+                    printf("\n~ You are not logged in yet!\n");
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -218,7 +218,7 @@ int main(int argc, char** argv) {
             	break;
             case IOPT_FETCH: 
                 if(sessionStatus != LOGGED_IN) {
-                    printf("~ You are not logged in yet!\n");
+                    printf("\n~ You are not logged in yet!\n");
                     opt = IOPT_WELCOME;
                     break;
                 }
@@ -228,16 +228,17 @@ int main(int argc, char** argv) {
                 req.data = buff;
                 request(socketfd, req, &res);
                 if (res.status == SUCCESS) {
-                    printf("~ fetch succeeded TODO: Show 10 new location per page\n");
+                    printf("\n~ fetch succeeded TODO: Show 10 new location per page\n");
                     //TODO: show fetch list in pages
                     opt = IOPT_MAINMENU;
                 } else {
-                    printf("~ No new location\n");
+                    printf("\n~ No new location\n");
                     opt = IOPT_MAINMENU;
                 }
                 break;
                 //request tren server
                 //hien thi cho nguoi dung 10 thong bao 1
+                //hoi nguoi dung muon luu vao may khong
         }
         if (opt == IOPT_EXIT) {
             printf("\nFarewell Site sharer\n\n");

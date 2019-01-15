@@ -51,10 +51,10 @@ Option loginMenu(){
 
         opt = atoi(buf);
         if (buf[0] == '\0') {
-            printf("~ You input nothing, if u wish to exit, please choose 3\n");
+            printf("\n~ You input nothing, if u wish to exit, please choose 3\n");
         }
         else if (opt < 1 || opt > 3) {
-            printf("~ Wrong input, please choose a number, from 1 to 3\n");
+            printf("\n~ Wrong input, please choose a number, from 1 to 3\n");
         }
     } while(opt < 1 || opt > 3);
     switch(opt) {
@@ -218,6 +218,10 @@ Option mainMenu(char username[]){
         // scanf("%[^\n]%*c", buf);
         // buf[strlen(buf)] = '\0';
         opt = atoi(buf);
+        if (opt < 1 || opt > 6)
+        {
+            printf("\n~ Please inut a number from 1 to 6\n");
+        }
     } while (opt < 1 || opt > 6);
 
     switch(opt) {
@@ -248,7 +252,7 @@ Option inputSharingReceiver(char *receiver){
     receiver[strlen(receiver) - 1] = '\0';
     if (receiver[0] == '\0') {
         printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+        return IOPT_MAINMENU;
     }
     return IOPT_SHARE;
 }
@@ -286,7 +290,7 @@ Option selectLocationToShare(LocationBook *book, char *username, Location **loca
                     if(buf[0] == '\0') {
                         printf("You input nothing, which means back\n");
                         *location = NULL;
-                        return IOPT_WELCOME;
+                        return IOPT_MAINMENU;
                     }
                     opt = atoi(buf);
                     if(opt < 1 || opt > 10) {

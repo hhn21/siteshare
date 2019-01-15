@@ -46,6 +46,7 @@ int authenticate(Session *session, char* credentials) {
 			session->user = *a;
 			return 1;
 		}
+		return 2;
 	}
 	return 0;
 }
@@ -161,17 +162,23 @@ void* handler(void *arg){
 	// communicate with client
 	Request req;
 	Response res;
-	int rs;			//result in boolean determind what to send back to user
+	int rs;			//result, determind what to send back to user
 
 	while(1) {
 		if(fetchRequest(connSock, &req) < 0) break;
 		switch(req.opcode) {
 			case LOGIN:
 				rs = authenticate(session, req.data);
-				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
-				} else  { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				switch(rs){
+					case 0:
+						res.status = ERROR; 	res.length = 28; 	res.data = "~ Username does not exist!";
+						break;
+					case 1:
+						res.status = SUCCESS; 	res.length = 0; 	res.data = "";
+						break;
+					case 2:
+						res.status = ERROR; 	res.length = 19; 	res.data = "~ Incorrect password!";
+						break;
 				}
 				break;
 			case SIGNUP:

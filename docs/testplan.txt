@@ -1,0 +1,17 @@
+I. Welcome screen:
+	1. Login:
+		a. Không ấn gì, enter =>back
+		b. a, không gì => back
+		c. a, b => wrong pass
+		d. a, a => Đăng nhập thành công
+	2. Signup:
+		a. Không ấn gì, enter =>back
+		b. a, không gì => back
+		
+	3. Exit:
+II. Main menu screen:
+	1. add location
+	2. share location
+	3. 
+
+
