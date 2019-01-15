@@ -113,6 +113,7 @@ int shareLocation(Session *session, Request req){
 	}
 	strcpy(location->sharedBy, location->owner);
 	strcpy(location->owner, receiver);
+	location->createdAt = time(NULL);
 	location->seen = 0;
 	pthread_mutex_lock(&locationBookMutex);
 	addLocationtoBook(locationBook, location);
@@ -137,13 +138,41 @@ int fetch(Session *session, char* username){
 	if(session->status == UNAUTHENTICATED) return 0;
 
 	//find the user's file
-	LocationBook* book = NULL;
-	int rs = importLocationOfUser(book, username);
-	if (rs < 0) return 0;
 	return 1;
 
 	//TODO: find the list that is not seen
 	//TODO: send em to user, mark them as seen
+}
+
+int deleteLocations(Session *session) {
+	pthread_mutex_lock(&locationBookMutex);
+	if(deleteLocationOfUser(locationBook, session->user.username) == 0) return 0;
+	pthread_mutex_unlock(&locationBookMutex);
+
+	pthread_mutex_lock(&locationDBMutex);
+	createUserDBFile(session->user.username);
+	pthread_mutex_unlock(&locationDBMutex);
+
+	return 1;
+}
+
+int saveLocation(Session *session, Request req) {
+	int locationNum = req.length / sizeof(Location);
+	Location *locations = (Location*)req.data;
+	Location *l;
+
+	pthread_mutex_lock(&locationBookMutex);
+	pthread_mutex_lock(&locationDBMutex);
+	for(int i = 0; i < locationNum; i++) {
+		l = malloc(sizeof(Location));
+		memcpy(l, &locations[i], sizeof(Location));
+		addLocationtoBook(locationBook, l);
+		addNewLocationOfUser(l, session->user.username);
+	}
+	pthread_mutex_unlock(&locationBookMutex);
+	pthread_mutex_unlock(&locationDBMutex);
+
+	return 1;
 }
 
 void* handler(void *arg){
@@ -163,6 +192,8 @@ void* handler(void *arg){
 	Request req;
 	Response res;
 	int rs;			//result, determind what to send back to user
+
+	Location locationArr[PAGE_SIZE];
 
 	while(1) {
 		if(fetchRequest(connSock, &req) < 0) break;
@@ -188,6 +219,7 @@ void* handler(void *arg){
 				} else  { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			case LOGOUT:
 				rs = logout(session);
 				if(rs) { 
@@ -203,6 +235,7 @@ void* handler(void *arg){
 				} else { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			case FETCH:
 				rs = fetch(session, req.data);
 				if(rs) { 
@@ -211,6 +244,29 @@ void* handler(void *arg){
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
 				break;
+			case DELETE_LOCATIONS:
+				rs = deleteLocations(session);
+				if(rs) { 
+					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+				} else  { 
+					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				}
+			case SAVE_LOCATION:
+				rs = saveLocation(session, req);
+				if(rs) { 
+					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+				} else  { 
+					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				}
+			case GET_OWNED:
+				rs = getLocationsOfUserByPage(locationBook, session->user.username, *(int*)req.data, locationArr);
+				if(rs > 0){
+					res.status = SUCCESS;
+					res.length = rs * sizeof(Location);
+					res.data = locationArr;
+				} else {
+					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				}
 			default:
 				break;
 		}

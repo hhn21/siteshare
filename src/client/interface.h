@@ -81,7 +81,7 @@ void printCategoryList();
  */
 Option inputLocationInfo(Location *location);
 
-/* Print our the login menu
+/* Print out the login menu
  * Params:
  *
  * Return:
@@ -97,8 +97,38 @@ void printMainMenu(char username[]);
  */
 Option mainMenu(char username[]);
 
+/* Input receiver
+ * Params:
+ *      receiver 
+ * Return:
+ *      IOPT_MAINMENU if user input nothing
+ *      IOPT_SHARE otherwise
+ */
 Option inputSharingReceiver(char *receiver);
 
+/* Print out locations of an user an let user select 1
+ * Params:
+ *      book LocationBook
+ *      username current user to select location
+ *      location location pointer to save selected location
+ * Return:
+ *      IOPT_MAINMENU if user input nothing
+ *      IOPT_SHARE otherwise
+ */
 Option selectLocationToShare(LocationBook *book, char *username, Location **location);
+
+/* Confirm to delete all locations on server and upload all location on local to server
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_SAVE if confirm
+ */
+Option confirmSaveLocation();
+
+/* Confirm to delete all locations on local and restore all location from server
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_RESTORE if confirm
+ */
+Option confirmRestoreLocation();
 
 #endif

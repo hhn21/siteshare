@@ -10,11 +10,13 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "account.h"
+
 #define BACKLOG 2
 
 #define TRUE             1
 #define FALSE            0
-#define BUFF_SIZE 		 255
+#define BUFF_SIZE 		 7000
 
 typedef int RequestLengthType;
 typedef int ResponseLengthType;
@@ -27,7 +29,8 @@ typedef enum {
 	SAVE_LOCATION,
 	GET_OWNED,
 	GET_SHARED,
-	FETCH			//fetch new location when user log in
+	FETCH,			//fetch new location when user log in
+	DELETE_LOCATIONS
 } RequestOpcode;
 
 typedef enum {
@@ -42,6 +45,7 @@ typedef enum {
 
 typedef struct {
 	int fd;    				// client socket descriptor
+	Account user;			// identify the user in the session
 	SessionStatus status;	// Session status
 } Session;
 

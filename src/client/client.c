@@ -75,9 +75,9 @@ int main(int argc, char** argv) {
     char receiver[ACC_NAME_MAX_LEN];
     char *buff = NULL;
     int buffSize;
-    Location *location;
-    FILE *fptr;
-    char filePath[100];
+    Location *location, *locations;
+    int currPage, rs, locationNum;
+    Location locationArr[10];
 
     Request req;
     Response res;
@@ -109,10 +109,7 @@ int main(int argc, char** argv) {
 					opt = IOPT_FETCH;
                     locationBook = newLocationBook();
 					if(importLocationOfUser(locationBook, username) < 0) {
-                        printf("\n~ Creating new data store ...\n");
-                        sprintf(filePath, "./data/%s.txt", username);
-                        fptr = fopen(filePath, "w");
-                        fclose(fptr);
+                        createUserDBFile(username);
                     }
             	} else {
                     printf("%s\n", (char*)res.data);
@@ -145,7 +142,7 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME;
                     break;
                 }
-                buff = NULL;
+                buff = "";
                 req.opcode = LOGOUT;
                 req.length = buffSize;
                 req.data = buff;
@@ -154,11 +151,13 @@ int main(int argc, char** argv) {
                     printf("\n~ Logout succeeded\n");
                     opt = IOPT_WELCOME;
                     destroyLocationBook(locationBook);
+                    locationBook = NULL;
                     sessionStatus = UNAUTHENTICATED;
                 } else {
-                    printf("\n~ Logout failed\n");
-                    opt = IOPT_SIGNUP;
+                    printf("~ Logout failed\n");
+                    opt = IOPT_MAINMENU;
                 }
+                buff = NULL;
             	break;
             case IOPT_EXIT:
             	break;
@@ -170,7 +169,12 @@ int main(int argc, char** argv) {
                 }
                 // create location
                 location = malloc(sizeof(Location));
-                inputLocationInfo(location);
+                opt = inputLocationInfo(location);
+                if(opt == IOPT_MAINMENU) {
+                    free(location);
+                    location = NULL;
+                    break;
+                }
                 strcpy(location->owner, username);
                 strcpy(location->sharedBy, "\0");
                 location->createdAt = time(NULL);
@@ -209,11 +213,79 @@ int main(int argc, char** argv) {
                 buff = NULL;
             	break;
             case IOPT_SAVE: 
-            	printf("save\n"); 
-                opt = IOPT_MAINMENU;
+                if(sessionStatus != LOGGED_IN) {
+                    printf("You are not logged in yet!\n");
+                    opt = IOPT_WELCOME; 
+                    break;
+                }
+                opt = confirmSaveLocation();
+                if(opt == IOPT_SAVE) {
+                    // send delete db request
+                    req.opcode = DELETE_LOCATIONS;
+                    req.length = 0;
+                    req.data = "";
+                    request(socketfd, req, &res);
+                    if (res.status != SUCCESS) {
+                        printf("Some error occured! Save failed\n");
+                        opt = IOPT_MAINMENU;
+                        break;
+                    }
+                    printf("Deleted locations on server\n");
+                    // send locations to server
+                    currPage = 1;
+                    do {
+                        rs = getLocationsOfUserByPage(locationBook, username, currPage++, locationArr);
+                        if(rs == 0) break;
+                        req.opcode = SAVE_LOCATION;
+                        req.length = rs * sizeof(Location);
+                        req.data = locationArr;
+                        request(socketfd, req, &res);
+                        if (res.status != SUCCESS) {
+                            printf("Some error occured! Save failed\n");
+                            opt = IOPT_MAINMENU;
+                            break;
+                        }
+                    } while(rs > 0);
+                    printf("Saved locations on server\n");
+                    opt = IOPT_MAINMENU;
+                }
             	break;
             case IOPT_RESTORE: 
-            	printf("restore\n"); 
+            	 if(sessionStatus != LOGGED_IN) {
+                    printf("You are not logged in yet!\n");
+                    opt = IOPT_WELCOME; 
+                    break;
+                }
+                opt = confirmRestoreLocation();
+                if(opt == IOPT_RESTORE) {
+                    // delete local locations
+                    deleteLocationOfUser(locationBook, username);
+                    createUserDBFile(username);
+                    printf("Deleted local locations\n");
+                    // restore locations from server
+                    currPage = 1;
+                    do {
+                        req.opcode = GET_OWNED;
+                        req.length = sizeof(int);
+                        req.data = &currPage;
+                        request(socketfd, req, &res);
+                        if (res.status == SUCCESS) {
+                            locationNum = res.length / sizeof(Location);
+                            locations = res.data;
+                            for(int i = 0; i < locationNum; i++) {
+                                location = malloc(sizeof(Location));
+                                memcpy(location, &locations[i], sizeof(Location));
+                                addLocationtoBook(locationBook, location);
+                                addNewLocationOfUser(location, username);
+                            }
+                        } else {
+                            opt = IOPT_MAINMENU;
+                            break;
+                        }
+                        currPage++;
+                    } while(1);
+                    printf("Restored locations successfully\n");
+                }
                 opt = IOPT_MAINMENU;
             	break;
             case IOPT_FETCH: 
@@ -222,9 +294,11 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME;
                     break;
                 }
-                buff = username;
+                printf("~ fetching unseen locations ...\n");
+                buff = malloc(strlen(username) + 1);
+                strcpy(buff, username);
                 req.opcode = FETCH;
-                req.length = strlen(buff) + 2;
+                req.length = strlen(username) + 1;
                 req.data = buff;
                 request(socketfd, req, &res);
                 if (res.status == SUCCESS) {
@@ -235,6 +309,9 @@ int main(int argc, char** argv) {
                     printf("\n~ No new location\n");
                     opt = IOPT_MAINMENU;
                 }
+                opt = IOPT_MAINMENU;
+                free(buff);
+                buff = NULL;
                 break;
                 //request tren server
                 //hien thi cho nguoi dung 10 thong bao 1

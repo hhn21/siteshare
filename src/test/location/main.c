@@ -48,40 +48,58 @@ int main(){
 	Location *l;
 	BookRow *row;
 	ListNode *node1, *node2;
+    int idx = 0;
+
+    printf("Location struct size: %lu \n", sizeof(Location));
 
 	// import data from file
 	locationNum = importLocationOfUser(locationBook, username);
 	printf("Imported %d locations\n", locationNum);
+
+    // deleteLocationOfUser(locationBook, username);
+
+    // add location to book
+    // Location *location = malloc(sizeof(Location));
+    // inputLocationInfo(location);
+    // strcpy(location->owner, username);
+    // strcpy(location->sharedBy, "\0");
+    // location->createdAt = time(NULL);
+    // location->seen = 1;
+
+    // addLocationtoBook(locationBook, location); // add location to in-memory book
+    // addNewLocationOfUser(location, username); // save location to db
+
+    // listTraverse(node1, locationBook->ownerList) {
+    //  row = (BookRow*)node1->data;
+    //  printf("Owner: %s\n", row->key);
+    //  listTraverse(node2, row->data){
+    //      l = (Location*)node2->data;
+    //      printf("'%s' %ld '%s' '%s' '%s' %d\n", l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+    //  }
+    // }
+
 
 	// print book data
 	listTraverse(node1, locationBook->ownerList) {
 		row = (BookRow*)node1->data;
 		printf("Owner: %s\n", row->key);
 		listTraverse(node2, row->data){
+            idx++;
 			l = (Location*)node2->data;
-			printf("'%s' %ld '%s' '%s' '%s' %d\n", l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+			printf("%d '%s' %ld '%s' '%s' '%s' %d\n", idx, l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
 		}
 	}
 
-	// add location to book
-	Location *location = malloc(sizeof(Location));
-	inputLocationInfo(location);
-    strcpy(location->owner, username);
-    strcpy(location->sharedBy, "\0");
-	location->createdAt = time(NULL);
-    location->seen = 1;
+	
+    // get location by page
+    printf("get location by page\n");
+    Location la[PAGE_SIZE];
+    int rs = getLocationsOfUserByPage(locationBook, username, 2, la);
 
-    addLocationtoBook(locationBook, location); // add location to in-memory book
-    addNewLocationOfUser(location, username); // save location to db
-
-    listTraverse(node1, locationBook->ownerList) {
-		row = (BookRow*)node1->data;
-		printf("Owner: %s\n", row->key);
-		listTraverse(node2, row->data){
-			l = (Location*)node2->data;
-			printf("'%s' %ld '%s' '%s' '%s' %d\n", l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
-		}
-	}
+    for(int i = 0; i < rs; i++) {
+        l = &la[i];
+        printf("%d '%s' %ld '%s' '%s' '%s' %d\n", i+1, l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+    }
 
     return 0;
 }

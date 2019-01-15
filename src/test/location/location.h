@@ -7,7 +7,7 @@
 
 #include "sllist.h"
 
-#define READ_BLOCK 10
+#define PAGE_SIZE 10
 
 #define ACC_NAME_MAX_LEN 45
 #define L_CAT_MAX_LEN 100
@@ -17,9 +17,9 @@
 typedef struct {
     char owner[ACC_NAME_MAX_LEN];           // name of owner of the location
     char sharedBy[ACC_NAME_MAX_LEN];        // name of account who shared location to owner
-    time_t createdAt;       // created time
-    char category[L_CAT_MAX_LEN];     // location category
-    char name[L_NAME_MAX_LEN];          // loction name
+    time_t createdAt;                       // created time
+    char category[L_CAT_MAX_LEN];           // location category
+    char name[L_NAME_MAX_LEN];              // loction name
     char note[L_NOTE_NAME_MAX_LEN];         // note
     int seen;
 } Location;
@@ -118,5 +118,28 @@ void destroyLocationBook(LocationBook* book);
  *      username
  */
 void createUserDBFile(char* username);
+
+/*
+ * get locations of an user indexed by giving page
+ * Params:
+ *   book LocationBook
+ *   username string username
+ *   page int
+ *   result array to save the result
+ * Return:
+ *   Number of locations have been gotten
+ */
+int getLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result);
+
+/*
+ * delete all location of an user from book
+ * params:
+ *      book LocationBook
+ *      username string
+ * return:
+ *      1 if deleted successfully
+ *      0 if not found username in book
+ */
+int deleteLocationOfUser(LocationBook *book, char* username);
 
 #endif
