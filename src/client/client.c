@@ -34,6 +34,15 @@ int makeSignupDataBuff(char* username, char* password, char** buff) {
 	return buffSize;
 }
 
+int makeShareDataBuff(char* receiver, Location *location, char** buff) {
+    int buffSize;
+    buffSize = strlen(receiver) + sizeof(Location) + 2;
+    *buff = malloc(buffSize);
+    memcpy(*buff, location, sizeof(Location));
+    memcpy(*buff + sizeof(Location), receiver, strlen(receiver) + 1);
+    return buffSize;
+}
+
 int main(int argc, char** argv) {
 	/********************************************* Process arguments *********************************************************/
 	if(argc != 3) error("You must run program with address and port number!");
@@ -63,6 +72,7 @@ int main(int argc, char** argv) {
     SessionStatus sessionStatus = UNAUTHENTICATED;
 	char username[ACC_NAME_MAX_LEN];
     char password[ACC_NAME_MAX_LEN];
+    char receiver[ACC_NAME_MAX_LEN];
     char *buff = NULL;
     int buffSize;
     Location *location;
@@ -172,8 +182,31 @@ int main(int argc, char** argv) {
                 opt = IOPT_MAINMENU;
             	break;
             case IOPT_SHARE: 
-            	printf("share\n"); 
+                if(sessionStatus != LOGGED_IN) {
+                    printf("You are not logged in yet!\n");
+                    opt = IOPT_WELCOME; 
+                    break;
+                }
+                // select location to share
+                opt = selectLocationToShare(locationBook, username, &location);
+                if(opt == IOPT_MAINMENU) break;
+                // input receiver
+                opt = inputSharingReceiver(receiver);
+                if(opt == IOPT_MAINMENU) break;
+                // send location to server
+                buffSize = makeShareDataBuff(receiver, location, &buff); // Buff: Location|receiver
+                req.opcode = SHARE_LOCATION;
+                req.length = buffSize;
+                req.data = buff;
+                request(socketfd, req, &res);
+                if (res.status == SUCCESS) {
+                    printf("Share succeeded!\n");
+                } else {
+                    printf("Share failed\n");
+                }
                 opt = IOPT_MAINMENU;
+                free(buff);
+                buff = NULL;
             	break;
             case IOPT_SAVE: 
             	printf("save\n"); 
@@ -184,7 +217,6 @@ int main(int argc, char** argv) {
                 opt = IOPT_MAINMENU;
             	break;
             case IOPT_FETCH: 
-            	printf("fetch\n");
                 if(sessionStatus != LOGGED_IN) {
                     printf("~ You are not logged in yet!\n");
                     opt = IOPT_WELCOME;

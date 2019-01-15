@@ -24,6 +24,7 @@ List *clientSessionList;
 pthread_mutex_t accountListMutex;
 pthread_mutex_t clientSessionMutex;
 pthread_mutex_t locationBookMutex;
+pthread_mutex_t locationDBMutex;
 
 /* try to authenticate a client credentials
  * params:
@@ -32,7 +33,7 @@ pthread_mutex_t locationBookMutex;
  *		0 if authentication fail
  *		1 if authentication success
  */
-int authenticate(char* credentials) {
+int authenticate(Session *session, char* credentials) {
 	char username[ACC_NAME_MAX_LEN];
 	char password[ACC_NAME_MAX_LEN];
 	Account *a;
@@ -40,7 +41,11 @@ int authenticate(char* credentials) {
 	sscanf(credentials, "%s\n%s", username, password);
 	a = findAccountByName(accountList, username);
 	if(a != NULL) {
-		if(strcmp(a->password, password) == 0) return 1;
+		if(strcmp(a->password, password) == 0) {
+			session->status = LOGGED_IN;
+			session->user = *a;
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -89,6 +94,36 @@ int logout(Session *session){
 	return 1;
 }
 
+int shareLocationDataProcess(Request req, char *receiver, Location *location){
+	int dataLen = req.length;
+	memcpy(location, req.data, sizeof(Location));
+	memcpy(receiver, req.data + sizeof(Location), dataLen - sizeof(Location));
+	return 1;
+}
+
+int shareLocation(Session *session, Request req){
+	char receiver[ACC_NAME_MAX_LEN];
+	Location *location = malloc(sizeof(Location));
+	shareLocationDataProcess(req, receiver, location);
+
+	if(strcmp(location->owner, session->user.username) != 0) {// validate sender
+		free(location);
+		return 0;
+	}
+	strcpy(location->sharedBy, location->owner);
+	strcpy(location->owner, receiver);
+	location->seen = 0;
+	pthread_mutex_lock(&locationBookMutex);
+	addLocationtoBook(locationBook, location);
+	pthread_mutex_unlock(&locationBookMutex);
+
+	pthread_mutex_lock(&locationDBMutex);
+	addNewLocationOfUser(location, receiver);
+	pthread_mutex_unlock(&locationDBMutex);
+
+	return 1;
+}
+
 /* fetch unseen shared location for user
  * params:
  *		session: session of client 
@@ -132,9 +167,8 @@ void* handler(void *arg){
 		if(fetchRequest(connSock, &req) < 0) break;
 		switch(req.opcode) {
 			case LOGIN:
-				rs = authenticate(req.data);
+				rs = authenticate(session, req.data);
 				if(rs) { 
-					session->status = LOGGED_IN;
 					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
 				} else  { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
@@ -155,8 +189,14 @@ void* handler(void *arg){
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
 				break;
+			case SHARE_LOCATION:
+				rs = shareLocation(session, req);
+				if(rs) { 
+					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+				} else { 
+					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				}
 			case FETCH:
-				printf("fetch\n");
 				rs = fetch(session, req.data);
 				if(rs) { 
 					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
@@ -180,6 +220,7 @@ void* handler(void *arg){
 		}
 		tmp = tmp->next;
 	}
+	free(session);
 	// close the socket
 	close(connSock);
 	return NULL;
@@ -193,7 +234,7 @@ int main(int argc, char** argv) {
 
 	/********************************************* Import data *********************************************************/
 	ListNode *node;
-	Account a;
+	Account *a;
 	// import accounts from file
 	accountList = newList();
 	if(importAccountFromFile(accountList, "./data/account.txt") < 0) return -1;
@@ -201,8 +242,10 @@ int main(int argc, char** argv) {
 	// import locations from file
 	locationBook = newLocationBook();
 	listTraverse(node, accountList) {
-		a = *(Account*)(node->data);
-		// if(importLocationOfUser(locationBook, a.username) < 0) return -1;
+		a = (Account*)(node->data);
+		if(importLocationOfUser(locationBook, a->username) < 0) {
+			createUserDBFile(a->username);
+		}
 	}
 
 	// init clientSessionList list

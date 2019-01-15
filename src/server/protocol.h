@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "account.h"
+
 #define BACKLOG 2
 
 #define TRUE             1
@@ -44,6 +46,7 @@ typedef struct {
 	int fd;    				// client socket descriptor
 	Account user;			// identify the user in the session
 	SessionStatus status;	// Session status
+	Account user;			// current user
 } Session;
 
 typedef struct {

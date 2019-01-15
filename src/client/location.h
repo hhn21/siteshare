@@ -7,6 +7,8 @@
 
 #include "sllist.h"
 
+#define READ_BLOCK 10
+
 #define ACC_NAME_MAX_LEN 45
 #define L_CAT_MAX_LEN 100
 #define L_NAME_MAX_LEN 128
@@ -93,7 +95,7 @@ int importLocationOfUser(LocationBook* book, char *username);
  *      username string
  *      
  */
-void addNewLocationOfUser(Location *location, char *username);
+int addNewLocationOfUser(Location *location, char *username);
 
 /*
  * save locations from LocationBook to file (1 location per line)
@@ -101,7 +103,7 @@ void addNewLocationOfUser(Location *location, char *username);
  *      book LocationBook
  *      username string
  */
-void saveLocationOfUser(LocationBook* book, char *username);
+int saveLocationOfUser(LocationBook* book, char *username);
 
 /*
  * free LocationBook from memory
@@ -109,5 +111,12 @@ void saveLocationOfUser(LocationBook* book, char *username);
  *      book LocationBook
  */
 void destroyLocationBook(LocationBook* book);
+
+/*
+ * create location db file of an user (delete old file if existed)
+ * params:
+ *      username
+ */
+void createUserDBFile(char* username);
 
 #endif
