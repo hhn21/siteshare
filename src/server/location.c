@@ -130,29 +130,22 @@ void addLocationtoBook(LocationBook* book, Location *location){
 int importLocationOfUser(LocationBook* book, char *username){
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpin = fopen(filename, "r");
+	FILE *fpin = fopen(filename, "rb");
 	if(fpin == NULL){
 	    printf("Error! Unable to open %s!\n", filename);
 	    return -1;
 	}
 
-    char sharedBy[ACC_NAME_MAX_LEN];		// name of account who shared location to owner
-    time_t createdAt;		// created time
-    char category[100];
-    char name[128];			// loction name
-    char note[255];			// note
-    int seen;
     int count = 0;
 
     Location *location;
-    while(!feof(fpin) && fscanf(fpin,"\"%s\" %ld \"%s\" \"%s\" \"%s\" %d\n", sharedBy, (long*)&createdAt, category, name, note, &seen)){
+    while(!feof(fpin)){
 	    location = malloc(sizeof(Location));
+	    if(fread(location, sizeof(Location), 1, fpin) != 1) {
+	    	free(location);
+	    	return 0;
+	    }
 	    strcpy(location->owner, username);
-	    strcpy(location->sharedBy, sharedBy);
-	    location->createdAt = createdAt;
-	    strcpy(location->category, category);
-	    strcpy(location->name, name);
-	    strcpy(location->note, note);
   		addLocationtoBook(book, location);
   		count++;
     }
@@ -167,16 +160,37 @@ int importLocationOfUser(LocationBook* book, char *username){
  *		book LocationBook
  *		username string
  */
-void saveLocationOfUser(LocationBook* book, char *username) {
+int addNewLocationOfUser(Location *l, char *username) {
+	char filename[100];
+	sprintf(filename, "%s/%s.txt", "data", username);
+	FILE *fpout = fopen(filename, "ab");
+	if(fpout == NULL){
+	    printf("Error! Unable to open %s!", filename);
+	}
+	else {
+		if(fwrite(l, sizeof(Location), 1, fpout) != 1) return 0;
+	}
+	fclose(fpout);
+	return 1;
+}
+
+/* 
+ * save locations from LocationBook to file (1 location per line)
+ * params: 
+ *		book LocationBook
+ *		username string
+ */
+int saveLocationOfUser(LocationBook* book, char *username) {
 	BookRow *row;
 	ListNode *node1, *node2;
 	Location *l;
 
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpout = fopen(filename, "w");
+	FILE *fpout = fopen(filename, "wb");
 	if(fpout == NULL){
-	    printf("Error! Unable to open %s!", filename);
+		printf("Error! Unable to open %s!", filename);
+	    return 0;
 	}
 	else {
 		listTraverse(node1, book->ownerList) {
@@ -184,11 +198,12 @@ void saveLocationOfUser(LocationBook* book, char *username) {
 			if(strcmp(username, row->key) != 0) continue;
 			listTraverse(node2, row->data){
 				l = (Location*)node2->data;
-				fprintf(fpout, "\"%s\" %ld \"%s\" \"%s\" \"%s\" %d\n", l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+				if(fwrite(l, sizeof(Location), 1, fpout) != 1) return 0;
 			}
 		}
 	}
 	fclose(fpout);
+	return 1;
 }
 
 /* 
@@ -209,4 +224,17 @@ void destroyLocationBook(LocationBook* book){
 	}
 	destroyList(book->ownerList);
 	destroyList(book->sharedList);
+}
+
+/*
+ * create location db file of an user (delete old file if existed)
+ * params:
+ *      username
+ */
+void createUserDBFile(char* username){
+	printf("Creating db file of user %s\n", username);
+	char filename[100];
+	sprintf(filename, "%s/%s.txt", "data", username);
+	FILE *fpout = fopen(filename, "w");
+	fclose(fpout);
 }

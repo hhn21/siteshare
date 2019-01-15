@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 #include "location.h"
+#include "account.h"
 
 #define OPT_MAX_LEN 50
 
@@ -93,5 +96,9 @@ void printMainMenu(char username[]);
  *
  */
 Option mainMenu(char username[]);
+
+Option inputSharingReceiver(char *receiver);
+
+Option selectLocationToShare(LocationBook *book, char *username, Location **location);
 
 #endif

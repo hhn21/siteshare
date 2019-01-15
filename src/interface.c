@@ -28,7 +28,7 @@ typedef enum {
  *
  */
 void printWelcomeScreen(){
-    int r = rand()%8;
+    int r = rand() % 8;
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     switch(r){
         case 1: printf("Welcome to Site Share"); break;
@@ -159,7 +159,6 @@ Option inputLocation(Location *l){
     printf("Location name: ");
     fgets(l->name, L_NAME_MAX_LEN, stdin);
     l->name[strlen(l->name) - 1] = '\0';
-    
 }
 
 /* Print our the login menu
@@ -191,11 +190,11 @@ void printMainMenu(char username[]){
 Option mainMenu(char username[]){
     char buf[OPT_MAX_LEN];
     int opt = 0;
-    do{
+    do {
         printMainMenu(username);
         scanf("%s", buf);
         opt = atoi(buf);
-    }while(opt<1 || opt >6);
+    } while(opt<1 || opt >6);
     switch(opt){
         case 1: return IOPT_ADD;
         case 2: return IOPT_SHARE;

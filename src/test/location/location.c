@@ -130,7 +130,7 @@ void addLocationtoBook(LocationBook* book, Location *location){
 int importLocationOfUser(LocationBook* book, char *username){
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpin = fopen(filename, "rb");
+	FILE *fpin = fopen(filename, "r");
 	if(fpin == NULL){
 	    printf("Error! Unable to open %s!\n", filename);
 	    return -1;
@@ -163,7 +163,7 @@ int importLocationOfUser(LocationBook* book, char *username){
 int addNewLocationOfUser(Location *l, char *username) {
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpout = fopen(filename, "ab");
+	FILE *fpout = fopen(filename, "a");
 	if(fpout == NULL){
 	    printf("Error! Unable to open %s!", filename);
 	}
@@ -187,7 +187,7 @@ int saveLocationOfUser(LocationBook* book, char *username) {
 
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpout = fopen(filename, "wb");
+	FILE *fpout = fopen(filename, "w");
 	if(fpout == NULL){
 		printf("Error! Unable to open %s!", filename);
 	    return 0;
