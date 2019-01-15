@@ -130,7 +130,7 @@ void addLocationtoBook(LocationBook* book, Location *location){
 int importLocationOfUser(LocationBook* book, char *username){
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpin = fopen(filename, "r");
+	FILE *fpin = fopen(filename, "rb");
 	if(fpin == NULL){
 	    printf("Error! Unable to open %s!\n", filename);
 	    return -1;
@@ -143,7 +143,7 @@ int importLocationOfUser(LocationBook* book, char *username){
 	    location = malloc(sizeof(Location));
 	    if(fread(location, sizeof(Location), 1, fpin) != 1) {
 	    	free(location);
-	    	return 0;
+	    	return count;
 	    }
 	    strcpy(location->owner, username);
   		addLocationtoBook(book, location);
@@ -163,7 +163,7 @@ int importLocationOfUser(LocationBook* book, char *username){
 int addNewLocationOfUser(Location *l, char *username) {
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpout = fopen(filename, "a");
+	FILE *fpout = fopen(filename, "ab");
 	if(fpout == NULL){
 	    printf("Error! Unable to open %s!", filename);
 	}
@@ -187,7 +187,7 @@ int saveLocationOfUser(LocationBook* book, char *username) {
 
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
-	FILE *fpout = fopen(filename, "w");
+	FILE *fpout = fopen(filename, "wb");
 	if(fpout == NULL){
 		printf("Error! Unable to open %s!", filename);
 	    return 0;
@@ -232,9 +232,64 @@ void destroyLocationBook(LocationBook* book){
  *      username
  */
 void createUserDBFile(char* username){
-	printf("Creating db file of user %s\n", username);
 	char filename[100];
 	sprintf(filename, "%s/%s.txt", "data", username);
 	FILE *fpout = fopen(filename, "w");
 	fclose(fpout);
+}
+
+/*
+ * get locations of an user indexed by giving page
+ * Params:
+ *   book LocationBook
+ *   username string username
+ *   page int page number
+ *   result array to save the result
+ * Return:
+ *   Number of locations have been gotten
+ */
+int getLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result){
+	List *locations = getLocationsByOwner(book, username);
+	ListNode *node = locations->root;
+	Location *l;
+	int i;
+
+	// go to desired page
+	for(i = 0; i < (page-1) * PAGE_SIZE; i++){
+		if(node == NULL) return 0;
+		node = node->next;
+	}
+
+	for(i = 0; i < PAGE_SIZE; i++) {
+		if(node == NULL) break;
+		l = (Location*)node->data;
+		result[i] = *l;
+		node = node->next;
+	}
+	return i;
+}
+
+/*
+ * delete all location of an user from book
+ * params:
+ *      book LocationBook
+ *      username string
+ * return:
+ *      1 if deleted successfully
+ *      0 if not found username in book
+ */
+int deleteLocationOfUser(LocationBook *book, char* username){
+	BookRow *row;
+	ListNode *node1;
+
+	listTraverse(node1, book->ownerList) {
+		row = (BookRow*)node1->data;
+		if(strcmp(username, row->key) != 0) continue;
+
+		destroyList(row->data);
+		row->data = newList();
+		break;
+	}
+
+	return 1;
 }
