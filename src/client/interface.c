@@ -158,24 +158,24 @@ Option inputLocationInfo(Location *location){
     location->category[strlen(location->category) - 1] = '\0';
     if (location->category[0] == '\0') {
         printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+        return IOPT_MAINMENU;
     }
     printf("Location Name: ");
     fgets(location->name, L_NAME_MAX_LEN, stdin);
     location->name[strlen(location->name) - 1] = '\0';
     if (location->name[0] == '\0') {
         printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+        return IOPT_MAINMENU;
     }
     printf("Location Note: ");
     fgets(location->note, L_NOTE_NAME_MAX_LEN, stdin);
     location->note[strlen(location->note) - 1] = '\0';
     if (location->note[0] == '\0') {
         printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+        return IOPT_MAINMENU;
     }
 
-    return IOPT_WELCOME;
+    return IOPT_ADD;
 }
 
 /* Print our the login menu
