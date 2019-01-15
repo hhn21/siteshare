@@ -117,4 +117,18 @@ Option inputSharingReceiver(char *receiver);
  */
 Option selectLocationToShare(LocationBook *book, char *username, Location **location);
 
+/* Confirm to delete all locations on server and upload all location on local to server
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_SAVE if confirm
+ */
+Option confirmSaveLocation();
+
+/* Confirm to delete all locations on local and restore all location from server
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_RESTORE if confirm
+ */
+Option confirmRestoreLocation();
+
 #endif

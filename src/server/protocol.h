@@ -16,7 +16,7 @@
 
 #define TRUE             1
 #define FALSE            0
-#define BUFF_SIZE 		 255
+#define BUFF_SIZE 		 7000
 
 typedef int RequestLengthType;
 typedef int ResponseLengthType;
@@ -29,7 +29,8 @@ typedef enum {
 	SAVE_LOCATION,
 	GET_OWNED,
 	GET_SHARED,
-	FETCH			//fetch new location when user log in
+	FETCH,			//fetch new location when user log in
+	DELETE_LOCATIONS
 } RequestOpcode;
 
 typedef enum {
