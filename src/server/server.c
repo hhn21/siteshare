@@ -83,8 +83,8 @@ int signup(char* credentials) {
  * params:
  *		session: session of client 
  * return:
- *		0 if signup fail
- *		1 if signup success
+ *		0 if logout fail
+ *		1 if logout success
  */
 int logout(Session *session){
 	if(session->status == UNAUTHENTICATED) return 0;
@@ -124,6 +124,27 @@ int shareLocation(Session *session, Request req){
 	return 1;
 }
 
+/* fetch unseen shared location for user
+ * params:
+ *		session: session of client 
+ * return:
+ *		0 if fetch fail
+ *		1 if fetch success
+ */
+int fetch(Session *session, char* username){
+	//check if user logged in yet
+	if(session->status == UNAUTHENTICATED) return 0;
+
+	//find the user's file
+	LocationBook* book = NULL;
+	int rs = importLocationOfUser(book, username);
+	if (rs < 0) return 0;
+	return 1;
+
+	//TODO: find the list that is not seen
+	//TODO: send em to user, mark them as seen
+}
+
 void* handler(void *arg){
 	int connSock;
 	connSock = *((int *) arg);
@@ -140,7 +161,7 @@ void* handler(void *arg){
 	// communicate with client
 	Request req;
 	Response res;
-	int rs;
+	int rs;			//result in boolean determind what to send back to user
 
 	while(1) {
 		if(fetchRequest(connSock, &req) < 0) break;
@@ -173,6 +194,13 @@ void* handler(void *arg){
 				if(rs) { 
 					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
 				} else { 
+					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				}
+			case FETCH:
+				rs = fetch(session, req.data);
+				if(rs) { 
+					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+				} else  { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
 				break;
@@ -241,12 +269,14 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 
+	printf("Server is listening\n");
+
 	//Step 3: Handle connections
 	while(1){
 		if ((connSock = accept(listenSock, (struct sockaddr*)&client, &addrSize)) == -1)
 			perror("\nError: ");
 
-		printf("You got a connection from %s\n", inet_ntoa(client.sin_addr) ); /* prints client's IP */
+		printf("Got a connection from %s\n", inet_ntoa(client.sin_addr) ); /* prints client's IP */
 		
 		/* For each client, spawns a thread, and the thread handles the new client */
 		pthread_create(&tid, NULL, &handler, &connSock);	

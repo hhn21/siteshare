@@ -10,8 +10,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "account.h"
-
 #define BACKLOG 2
 
 #define TRUE             1
@@ -28,8 +26,7 @@ typedef enum {
 	SHARE_LOCATION,
 	SAVE_LOCATION,
 	GET_OWNED,
-	GET_SHARED,
-	FETCH			//fetch new location when user log in
+	GET_SHARED
 } RequestOpcode;
 
 typedef enum {
@@ -37,16 +34,16 @@ typedef enum {
 	ERROR
 } ResponseStatus;
 
+//need review, minh gui username va password 1 the luon.
 typedef enum {
-	UNAUTHENTICATED,
+	WAITING_USN,
+	WAITING_PASS,
 	LOGGED_IN
 } SessionStatus;
 
 typedef struct {
 	int fd;    				// client socket descriptor
-	Account user;			// identify the user in the session
 	SessionStatus status;	// Session status
-	Account user;			// current user
 } Session;
 
 typedef struct {

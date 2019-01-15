@@ -87,7 +87,14 @@ int main(int argc, char** argv) {
 	do {
         switch(opt) {
             case IOPT_WELCOME: opt = loginMenu(); break;
-            case IOPT_MAINMENU: opt = mainMenu(username); break;
+            case IOPT_MAINMENU: 
+                if(sessionStatus != LOGGED_IN) {
+                    printf("~ You are not logged in yet!\n");
+                    opt = IOPT_WELCOME;
+                    break;
+                }
+                opt = mainMenu(username);
+                break;
             case IOPT_LOGIN: 
             	opt = inputLoginCredentials(username,password);
             	if(opt == IOPT_WELCOME) break;
@@ -97,18 +104,18 @@ int main(int argc, char** argv) {
             	req.data = buff;
             	request(socketfd, req, &res);
             	if (res.status == SUCCESS) {
-					printf("Login succeeded\n");
+					printf("~ Login succeeded\n");
                     sessionStatus = LOGGED_IN;
-					opt = IOPT_MAINMENU;
+					opt = IOPT_FETCH;
                     locationBook = newLocationBook();
 					if(importLocationOfUser(locationBook, username) < 0) {
-                        printf("Creating new data store ...\n");
+                        printf("~ Creating new data store ...\n");
                         sprintf(filePath, "./data/%s.txt", username);
                         fptr = fopen(filePath, "w");
                         fclose(fptr);
                     }
             	} else {
-            		printf("Your credentials does not match our record\n");
+            		printf("~ Your credentials does not match our record\n");
             		opt = IOPT_WELCOME;
             	}
             	free(buff);
@@ -123,10 +130,10 @@ int main(int argc, char** argv) {
             	req.data = buff;
             	request(socketfd, req, &res);
             	if (res.status == SUCCESS) {
-					printf("Signup succeeded! Now you can login to system\n");
+					printf("~ Signup succeeded! Now you can login to system\n");
 					opt = IOPT_WELCOME;
             	} else {
-            		printf("Signed up failed\n");
+            		printf("~ Signed up failed\n");
             		opt = IOPT_SIGNUP;
             	}
                 free(buff);
@@ -134,7 +141,8 @@ int main(int argc, char** argv) {
             	break;
             case IOPT_LOGOUT:
                 if(sessionStatus != LOGGED_IN) {
-                    printf("You are not logged in yet!\n");
+                    printf("~ You are not logged in yet!\n");
+                    opt = IOPT_WELCOME;
                     break;
                 }
                 buff = NULL;
@@ -143,12 +151,12 @@ int main(int argc, char** argv) {
                 req.data = buff;
                 request(socketfd, req, &res);
                 if (res.status == SUCCESS) {
-                    printf("Logout succeeded\n");
+                    printf("~ Logout succeeded\n");
                     opt = IOPT_WELCOME;
                     destroyLocationBook(locationBook);
                     sessionStatus = UNAUTHENTICATED;
                 } else {
-                    printf("Logout failed\n");
+                    printf("~ Logout failed\n");
                     opt = IOPT_SIGNUP;
                 }
             	break;
@@ -156,7 +164,7 @@ int main(int argc, char** argv) {
             	break;
             case IOPT_ADD: 
                 if(sessionStatus != LOGGED_IN) {
-                    printf("You are not logged in yet!\n");
+                    printf("~ You are not logged in yet!\n");
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -202,13 +210,34 @@ int main(int argc, char** argv) {
             	break;
             case IOPT_SAVE: 
             	printf("save\n"); 
+                opt = IOPT_MAINMENU;
             	break;
             case IOPT_RESTORE: 
             	printf("restore\n"); 
+                opt = IOPT_MAINMENU;
             	break;
             case IOPT_FETCH: 
-            	printf("fetch\n"); 
-            	break;
+                if(sessionStatus != LOGGED_IN) {
+                    printf("~ You are not logged in yet!\n");
+                    opt = IOPT_WELCOME;
+                    break;
+                }
+                buff = username;
+                req.opcode = FETCH;
+                req.length = strlen(buff) + 2;
+                req.data = buff;
+                request(socketfd, req, &res);
+                if (res.status == SUCCESS) {
+                    printf("~ fetch succeeded TODO: Show 10 new location per page\n");
+                    //TODO: show fetch list in pages
+                    opt = IOPT_MAINMENU;
+                } else {
+                    printf("~ No new location\n");
+                    opt = IOPT_MAINMENU;
+                }
+                break;
+                //request tren server
+                //hien thi cho nguoi dung 10 thong bao 1
         }
         if (opt == IOPT_EXIT) {
             printf("\nFarewell Site sharer\n\n");
