@@ -18,40 +18,6 @@
 #include "interface.h"
 
 
-/*
- * add username\npassword to buff and return buffsize
- *  params:
- *      char* username
- *      char* password
- *      char** buff
- *  return: int
- *      buffsize
- */
-int makeAuthDataBuff(char* username, char* password, char** buff) {
-    int buffSize;
-    buffSize = strlen(username) + strlen(password) + 2;
-    *buff = malloc(buffSize);
-    sprintf(*buff, "%s\n%s", username, password);
-    return buffSize;
-}
-
-/*
- * add location and receiver to buff and return buffsize
- *  params:
- *      char* receiver
- *      Location* location
- *      char** buff
- *  return: int
- *      buffsize
- */
-int makeShareDataBuff(char* receiver, Location *location, char** buff) {
-    int buffSize;
-    buffSize = strlen(receiver) + sizeof(Location) + 2;
-    *buff = malloc(buffSize);
-    memcpy(*buff, location, sizeof(Location));
-    memcpy(*buff + sizeof(Location), receiver, strlen(receiver) + 1);
-    return buffSize;
-}
 
 int main(int argc, char** argv) {
 	/********************************************* Process arguments *********************************************************/
@@ -123,8 +89,8 @@ int main(int argc, char** argv) {
             	request(socketfd, req, &res);
             	
             	//receive response from server
+                printf("\n%s\n", (char*)res.data);
             	if (res.status == SUCCESS) {
-					printf("\n~ Login succeeded\n");
                     sessionStatus = LOGGED_IN;
 					opt = IOPT_FETCH;
                     locationBook = newLocationBook();
@@ -132,7 +98,6 @@ int main(int argc, char** argv) {
                         createUserDBFile(username);
                     }
             	} else {
-                    printf("%s\n", (char*)res.data);
             		opt = IOPT_LOGIN;
             	}
             	free(buff);
@@ -153,13 +118,14 @@ int main(int argc, char** argv) {
             	request(socketfd, req, &res);
 
             	//receive response from server
+                printf("\n%s\n", (char*)res.data);
             	if (res.status == SUCCESS) {
-					printf("\n~ Signup succeeded! Now you can login to system\n");
 					opt = IOPT_WELCOME;
             	} else {
-                    printf("\n~ Signup failed! Username already exists\n");
             		opt = IOPT_SIGNUP;
             	}
+
+                //free malloc for further use
                 free(buff);
                 buff = NULL;
                 free(res.data);
@@ -182,16 +148,17 @@ int main(int argc, char** argv) {
                 request(socketfd, req, &res);
 
             	//receive response from server
+                printf("\n%s\n", (char*)res.data);
                 if (res.status == SUCCESS) {
-                    printf("\n~ Logout succeeded\n");
                     opt = IOPT_WELCOME;
                     destroyLocationBook(locationBook);
                     locationBook = NULL;
                     sessionStatus = UNAUTHENTICATED;
                 } else {
-                    printf("~ Logout failed\n");
                     opt = IOPT_MAINMENU;
                 }
+
+                //free malloc for further use
                 buff = NULL;
                 free(res.data);
             	break;
@@ -225,6 +192,7 @@ int main(int argc, char** argv) {
 
                 // save location to db
                 addNewLocationOfUser(location, username);
+                printf("\n~ New location added! Welldone Site sharer\n");
                 opt = IOPT_MAINMENU;
             	break;
 
@@ -237,7 +205,7 @@ int main(int argc, char** argv) {
                 }
                 break;
 
-/******************************** 2. Show server location ********************************/
+/******************************** 3. Show server location ********************************/
             case IOPT_SHOW_SERVER:
                 currPage = 1;
                 do {
@@ -287,7 +255,7 @@ int main(int argc, char** argv) {
                 } while(1);
                 break;
 
-/******************************** 3. Share location ********************************/
+/******************************** 4. Share location ********************************/
             case IOPT_SHARE:
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
@@ -310,12 +278,17 @@ int main(int argc, char** argv) {
                 req.length = buffSize;
                 req.data = buff;
                 request(socketfd, req, &res);
+
+                // receive response from server
+                printf("\n%s\n", (char*)res.data);
                 if (res.status == SUCCESS) {
-                    printf("Share succeeded!\n");
+                    // printf("Share succeeded!\n");
                 } else {
-                    printf("Share failed\n");
+                    printf("\nTODO: why fail, share user does not exist?\n");
                 }
                 opt = IOPT_MAINMENU;
+
+                //free malloc for further use
                 free(buff);
                 buff = NULL;
                 free(res.data);

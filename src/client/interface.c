@@ -1,5 +1,7 @@
 #include "interface.h"
 
+
+/****************************** Welcome screen ******************************/
 /* used in welcomeMenu()
  * Print out the welcome screen
  */
@@ -56,6 +58,10 @@ Option welcomeMenu(){
     return IOPT_EXIT;
 }
 
+
+
+/****************************** authentication ******************************/
+/****************************** Login *****/
 /* case: IOPT_LOGIN
  * take username and password from user, check Auth()
  *  Params:
@@ -85,6 +91,24 @@ Option inputLoginCredentials(char* username, char* password){
     return IOPT_LOGIN;
 }
 
+/*
+ * add username\npassword to buff and return buffsize
+ *  params:
+ *      char* username
+ *      char* password
+ *      char** buff
+ *  return: int
+ *      buffsize
+ */
+int makeAuthDataBuff(char* username, char* password, char** buff) {
+    int buffSize;
+    buffSize = strlen(username) + strlen(password) + 2;
+    *buff = malloc(buffSize);
+    sprintf(*buff, "%s\n%s", username, password);
+    return buffSize;
+}
+
+/****************************** sign up *****/
 /* case: IOPT_SIGNUP
  * take username and password from user
  *  Params:
@@ -114,6 +138,72 @@ Option inputSignupCredentials(char username[], char password[]){
     return IOPT_SIGNUP;
 }
 
+
+
+
+/****************************** Main menu ******************************/
+/* used in mainMenu(), Print out the main menu
+ *  Params:
+ *      username
+ */
+void printMainMenu(char username[]){
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("Main menu (logged in as %s)\n", username);
+    printf("1. Add new location\n");
+    printf("2. Show local location\n");
+    printf("3. Show server location\n");
+    printf("4. Share location\n");
+    printf("5. Save to server\n");
+    printf("6. Restore from server\n");
+    printf("7. Log out\n");
+    printf("8. Exit\n");
+    printf("----------\n");
+    printf("Please choose from 1 to 8\n");
+    printf("Your choice: ");
+}
+
+/* Print our the main menu
+ *  Params:
+ *      username
+ *  Return: Option
+ *      IOPT_ADD;
+ *      IOPT_SHOW_LOCAL;
+ *      IOPT_SHOW_SERVER;
+ *      IOPT_SHARE;
+ *      IOPT_SAVE;
+ *      IOPT_RESTORE;
+ *      IOPT_LOGOUT;
+ *      IOPT_EXIT
+ */
+Option mainMenu(char username[]){
+    char buf[OPT_MAX_LEN];
+    int opt = 0;
+    do {
+        printMainMenu(username);
+        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+        opt = atoi(buf);
+        if (opt < 1 || opt > 8)
+        {
+            printf("\n~ Please inut a number from 1 to 8\n");
+        }
+    } while (opt < 1 || opt > 8);
+
+    switch(opt) {
+        case 1: return IOPT_ADD;
+        case 2: return IOPT_SHOW_LOCAL;
+        case 3: return IOPT_SHOW_SERVER;
+        case 4: return IOPT_SHARE;
+        case 5: return IOPT_SAVE;
+        case 6: return IOPT_RESTORE;
+        case 7: return IOPT_LOGOUT;
+        case 8: return IOPT_EXIT;
+    }
+    return IOPT_EXIT;
+}
+    
+
+/****************************** add location ******************************/
 /*
  * used in inputLocationInfo
  */
@@ -138,11 +228,11 @@ void printCategoryList() {
 /* case: IOPT_ADD
  * input location info
  *  Params:
- *      char username[]
+ *      Location* location
  *
  *  Return: Option
- *      IOPT_WELCOME (if not logged in yet)
- *      IOPT_MAINMENU (if succeed)
+ *      IOPT_ADD (if succeed, continue)
+ *      IOPT_MAINMENU (if user input nothing)
  */
 Option inputLocationInfo(Location *location){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -174,59 +264,9 @@ Option inputLocationInfo(Location *location){
     return IOPT_ADD;
 }
 
-/* Print our the main menu
- *  Params:
- *      username
- */
-void printMainMenu(char username[]){
-    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("Main menu (logged in as %s)\n", username);
-    printf("1. Add new location\n");
-    printf("2. Show local location\n");
-    printf("3. Show server location\n");
-    printf("4. Share location\n");
-    printf("5. Save to server\n");
-    printf("6. Restore from server\n");
-    printf("7. Log out\n");
-    printf("8. Exit\n");
-    printf("----------\n");
-    printf("Please choose from 1 to 8\n");
-    printf("Your choice: ");
-}
 
-/* Print our the login menu
- * Params:
- *
- * Return:
- *
- */
-Option mainMenu(char username[]){
-    char buf[OPT_MAX_LEN];
-    int opt = 0;
-    do {
-        printMainMenu(username);
-        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
-        buf[strlen(buf) - 1] = '\0';
-        opt = atoi(buf);
-        if (opt < 1 || opt > 8)
-        {
-            printf("\n~ Please inut a number from 1 to 8\n");
-        }
-    } while (opt < 1 || opt > 8);
 
-    switch(opt) {
-        case 1: return IOPT_ADD;
-        case 2: return IOPT_SHOW_LOCAL;
-        case 3: return IOPT_SHOW_SERVER;
-        case 4: return IOPT_SHARE;
-        case 5: return IOPT_SAVE;
-        case 6: return IOPT_RESTORE;
-        case 7: return IOPT_LOGOUT;
-        case 8: return IOPT_EXIT;
-    }
-    return IOPT_EXIT;
-}
-
+/****************************** share to another user ******************************/
 /* Input receiver
  * Params:
  *      receiver 
@@ -245,6 +285,24 @@ Option inputSharingReceiver(char *receiver){
     return IOPT_SHARE;
 }
 
+/*
+ * add location and receiver to buff and return buffsize
+ *  params:
+ *      char* receiver
+ *      Location* location
+ *      char** buff
+ *  return: int
+ *      buffsize
+ */
+int makeShareDataBuff(char* receiver, Location *location, char** buff) {
+    int buffSize;
+    buffSize = strlen(receiver) + sizeof(Location) + 2;
+    *buff = malloc(buffSize);
+    memcpy(*buff, location, sizeof(Location));
+    memcpy(*buff + sizeof(Location), receiver, strlen(receiver) + 1);
+    return buffSize;
+}
+
 /* Print out locations of an user an let user select 1
  * Params:
  *      book LocationBook
@@ -254,52 +312,8 @@ Option inputSharingReceiver(char *receiver){
  *      IOPT_MAINMENU if user input nothing
  *      IOPT_SHARE otherwise
  */
-Option selectLocationToShare(LocationBook *book, char *username, Location **location) {
+Option selectLocationToShare(LocationBook *book, char *username, Location **location){
     return showLocalLocation(book, username, location);
-}
-
-/* Confirm to delete all locations on server and upload all location on local to server
- * Return:
- *      IOPT_MAINMENU if not confirm
- *      IOPT_SAVE if confirm
- */
-Option confirmSaveLocation(){
-    char buf[OPT_MAX_LEN];
-
-    printf("This operation will delete all locations on server!\n");
-    printf("Do you want to continue? (y/n): ");
-    
-    do {
-        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
-        buf[strlen(buf) - 1] = '\0';
-        if(strcmp(buf, "y") == 0) return IOPT_SAVE;
-        if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
-        printf("Wrong input, please try again: ");
-    } while (1);
-    
-    return IOPT_MAINMENU;
-}
-
-/* Confirm to delete all locations on local and restore all location from server
- * Return:
- *      IOPT_MAINMENU if not confirm
- *      IOPT_RESTORE if confirm
- */
-Option confirmRestoreLocation(){
-    char buf[OPT_MAX_LEN];
-
-    printf("This operation will delete all local locations!\n");
-    printf("Do you want to continue? (y/n): ");
-    
-    do {
-        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
-        buf[strlen(buf) - 1] = '\0';
-        if(strcmp(buf, "y") == 0) return IOPT_RESTORE;
-        if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
-        printf("Wrong input, please try again: ");
-    } while (1);
-    
-    return IOPT_MAINMENU;
 }
 
 /* Print location table labels*/
@@ -440,4 +454,54 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
         }
     }
     return IOPT_SHARE;
+}
+
+
+
+/****************************** save to server ******************************/
+/* Confirm to delete all locations on server and upload all location on local to server
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_SAVE if confirm
+ */
+Option confirmSaveLocation(){
+    char buf[OPT_MAX_LEN];
+
+    printf("This operation will delete all locations on server!\n");
+    printf("Do you want to continue? (y/n): ");
+    
+    do {
+        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+        if(strcmp(buf, "y") == 0) return IOPT_SAVE;
+        if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
+        printf("Wrong input, please try again: ");
+    } while (1);
+    
+    return IOPT_MAINMENU;
+}
+
+
+
+/****************************** Restore from server ******************************/
+/* Confirm to delete all locations on local and restore all location from server
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_RESTORE if confirm
+ */
+Option confirmRestoreLocation(){
+    char buf[OPT_MAX_LEN];
+
+    printf("This operation will delete all local locations!\n");
+    printf("Do you want to continue? (y/n): ");
+    
+    do {
+        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+        if(strcmp(buf, "y") == 0) return IOPT_RESTORE;
+        if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
+        printf("Wrong input, please try again: ");
+    } while (1);
+    
+    return IOPT_MAINMENU;
 }

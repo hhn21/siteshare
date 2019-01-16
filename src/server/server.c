@@ -33,7 +33,7 @@ pthread_mutex_t locationDBMutex;	//TODO
  * return:
  *	0 if account does not exist
  *	1 if authentication success
- *	2 if incorrect password
+ *	-1 if incorrect password
  */
 int authenticate(Session *session, char* credentials) {
 	char username[ACC_NAME_MAX_LEN];
@@ -208,38 +208,38 @@ void* handler(void *arg){
 				rs = authenticate(session, req.data);
 				switch(rs){
 					case 0:
-						res.status = ERROR; 	res.length = 28; 	res.data = "~ Username does not exist!";
+						res.status = ERROR; 	res.length = 27; 	res.data = "~ Username does not exist!";
 						break;
 					case 1:
-						res.status = SUCCESS; 	res.length = 0; 	res.data = "";
+						res.status = SUCCESS; 	res.length = 18; 	res.data = "~ Login succeeded";
 						break;
-					case 2:
-						res.status = ERROR; 	res.length = 19; 	res.data = "~ Incorrect password!";
+					case -1:
+						res.status = ERROR; 	res.length = 22; 	res.data = "~ Incorrect password!";
 						break;
 				}
 				break;
 			case SIGNUP:
 				rs = signup(req.data);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+					res.status = SUCCESS; 	res.length = 48; 	res.data = "~ Signup succeeded! Now you can login to system"; 
 				} else  { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+					res.status = ERROR; 	res.length = 41; 	res.data = "~ Signup failed! Username already exists"; 
 				}
 				break;
 			case LOGOUT:
 				rs = logout(session);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+					res.status = SUCCESS; 	res.length = 19; 	res.data = "~ Logout succeeded"; 
 				} else  { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+					res.status = ERROR; 	res.length = 16; 	res.data = "~ Logout failed"; 
 				}
 				break;
 			case SHARE_LOCATION:
 				rs = shareLocation(session, req);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+					res.status = SUCCESS; 	res.length = 19; 	res.data = "~ Share succeeded!"; 
 				} else { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+					res.status = ERROR; 	res.length = 0; 	res.data = ""; //TODO: check user
 				}
 				break;
 			case FETCH:

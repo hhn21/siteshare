@@ -18,6 +18,14 @@
 #define FALSE            0
 #define BUFF_SIZE 		 7000
 
+//response message from server to client
+#define USERNAME_NOT_EXIST "~ Username does not exist!"
+#define LOGIN_SUCCESS "~ Login succeeded"
+#define PASSWORD_INCORRECT "~ Incorrect password!"
+#define SIGNUP_SUCCESS "~ Signup succeeded! Now you can login to system"
+#define SIGNUP_SUCCESS "~ Signup succeeded! Now you can login to system"
+
+
 typedef int RequestLengthType;
 typedef int ResponseLengthType;
 
