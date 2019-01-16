@@ -18,6 +18,21 @@
 #define FALSE            0
 #define BUFF_SIZE 		 7000
 
+#define ADDRESS_PORT_NEED "\n~ You must run program with address and port number!"
+#define PORT_INVALID "\n~ Invalid port number" 
+#define SERVER_CANNOT_CONNECT "\nError! Can not connect to sever! Client exit imediately!\n" 
+#define LOGIN_NOT "\n~ You are not logged in yet!\n" 
+#define ADD_LOCATION_SUCCESS "\n~ New location added! Welldone Site sharer <3\n" 
+#define NO_RESULT "\nNo results\n" 
+#define PREV_PAGE_HOW "Type '\\p' to prev page "
+#define NEXT_PAGE_HOW "Type '\\n' to next page"
+#define NO_PREV_PAGE "\n~ No previous page\n"
+#define NO_NEXT_PAGE "\n~ No next page!\n"
+#define SERVER_LOCATION_DELETE_SUCCESS "\n~ Server locations deleted\n"
+#define SAVE_LOCATION_SUCCESS "\n~ Locations saved to server. We got your back ;)\n"
+#define RESTORE_LOCATION_SUCCESS "\n~ Restored locations successfully. Worry not, Site sharer!\n"
+#define FAREWELL "\nFarewell Site sharer\n\n"
+
 typedef int RequestLengthType;
 typedef int ResponseLengthType;
 

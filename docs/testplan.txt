@@ -15,7 +15,11 @@ II. Main menu screen:
 		b. Shop, không gì => back
 		c. Shop, Sivi Mart, không gì => back
 		d. Shop, Sivi Mart, chỗ này rẻ, => success
-	2. share location
-	3. 
+	2. Show local:
+		a. 
+	3. Show server:
+		a.
+	4. Share location:
+		a.
 
 

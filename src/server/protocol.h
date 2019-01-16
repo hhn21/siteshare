@@ -30,7 +30,8 @@
 #define LOGOUT_FAIL "~ Logout failed"
 
 #define SHARE_SUCCESS "~ Share succeeded! The world owes you a new discovery"
-#define SHARE_FAIL "~ Share failed"
+#define SHARE_FAIL_AUTH_USER "~ Share failed. You do not have authority towards the Site"
+#define SHARE_FAIL_USERNAME_NOT_EXIST "~ Share failed. User does not exists"
 
 #define SAVE_SUCCESS "~ Saved locations on server"
 #define SAVE_FAIL "~ Some error occured! Save failed"

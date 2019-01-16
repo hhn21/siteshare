@@ -47,7 +47,7 @@ Option welcomeMenu(){
             printf("\n~ You input nothing, if u wish to exit, please choose 3\n");
         }
         else if (opt < 1 || opt > 3) {
-            printf("\n~ Wrong input, please choose a number, from 1 to 3\n");
+            printf("\n~ Invalid input, please choose a number, from 1 to 3\n");
         }
     } while(opt < 1 || opt > 3);
     switch(opt) {
@@ -68,7 +68,7 @@ Option welcomeMenu(){
  *      char username[]
  *      char password[]
  *  Return: Option
- *      IOPT_WELCOME (if wrong username or password or input nothing)
+ *      IOPT_WELCOME (if Invalid username or password or input nothing)
  *      IOPT_MAINMENU (if succeed)
  */
 Option inputLoginCredentials(char* username, char* password){
@@ -115,7 +115,7 @@ int makeAuthDataBuff(char* username, char* password, char** buff) {
  *      char username[]
  *      char password[]
  *  Return: Option
- *      IOPT_WELCOME (if wrong username already exist or input nothing)
+ *      IOPT_WELCOME (if Invalid username already exist or input nothing)
  *      IOPT_MAINMENU (if succeed)
  */
 Option inputSignupCredentials(char username[], char password[]){
@@ -185,7 +185,7 @@ Option mainMenu(char username[]){
         opt = atoi(buf);
         if (opt < 1 || opt > 8)
         {
-            printf("\n~ Please inut a number from 1 to 8\n");
+            printf("\n~ Please input a number from 1 to 8\n");
         }
     } while (opt < 1 || opt > 8);
 
@@ -351,7 +351,7 @@ int pageNavigate(int min, int max) {
     char buf[OPT_MAX_LEN];
 
     while(1) {
-        printf("\n\nChoose location (%d-%d), enter to quit: ", min, max);
+        printf("\nChoose location (%d-%d), enter to quit: ", min, max);
         fgets(buf, OPT_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
 
@@ -476,7 +476,7 @@ Option confirmSaveLocation(){
         buf[strlen(buf) - 1] = '\0';
         if(strcmp(buf, "y") == 0) return IOPT_SAVE;
         if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
-        printf("\n~ Wrong input, please try again: ");
+        printf("\n~ Invalid input, please try again: ");
     } while (1);
     
     return IOPT_MAINMENU;
@@ -501,7 +501,7 @@ Option confirmRestoreLocation(){
         buf[strlen(buf) - 1] = '\0';
         if(strcmp(buf, "y") == 0) return IOPT_RESTORE;
         if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
-        printf("\n~ Wrong input, please try again: ");
+        printf("\n~ Invalid input, please try again: ");
     } while (1);
     
     return IOPT_MAINMENU;

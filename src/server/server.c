@@ -248,12 +248,20 @@ void* handler(void *arg){
 				break;
 			case SHARE_LOCATION:
 				rs = shareLocation(session, req);
-				if(rs) { 
+				if(rs == 1) { 
 					res.status = SUCCESS;
 					res.length = strlen(SHARE_SUCCESS)+1;
 					res.data = SHARE_SUCCESS; 
-				} else { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; //TODO: check user
+				} else if (rs == -1)
+				{
+					res.status = ERROR;
+					res.length = strlen(SHARE_FAIL_AUTH_USER)+1;
+					res.data = SHARE_FAIL_AUTH_USER; 
+				} else if (rs == -2)
+				{
+					res.status = ERROR;
+					res.length = strlen(SHARE_FAIL_USERNAME_NOT_EXIST)+1;
+					res.data = SHARE_FAIL_USERNAME_NOT_EXIST; 
 				}
 				break;
 			case FETCH:
