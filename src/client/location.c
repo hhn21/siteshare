@@ -115,7 +115,7 @@ void addLocationtoBook(LocationBook* book, Location *location){
 		row->data = newList();
 		insertAtTail(book->sharedList, (void*)row);
 	}
-	insertAtTail(row->data, (void*)location);
+	insertAtHead(row->data, (void*)location);
 }
 
 /* 
@@ -181,8 +181,8 @@ int addNewLocationOfUser(Location *l, char *username) {
  *		username string
  */
 int saveLocationOfUser(LocationBook* book, char *username) {
-	BookRow *row;
-	ListNode *node1, *node2;
+	List *locations;
+	ListNode *node;
 	Location *l;
 
 	char filename[100];
@@ -193,14 +193,13 @@ int saveLocationOfUser(LocationBook* book, char *username) {
 	    return 0;
 	}
 	else {
-		listTraverse(node1, book->ownerList) {
-			row = (BookRow*)node1->data;
-			if(strcmp(username, row->key) != 0) continue;
-			listTraverse(node2, row->data){
-				l = (Location*)node2->data;
-				if(fwrite(l, sizeof(Location), 1, fpout) != 1) return 0;
-			}
+		locations = getLocationsByOwner(book, username);
+		reverseList(locations);
+		listTraverse(node, locations){
+			l = (Location*)node->data;
+			if(fwrite(l, sizeof(Location), 1, fpout) != 1) return 0;
 		}
+		reverseList(locations);
 	}
 	fclose(fpout);
 	return 1;
@@ -292,4 +291,61 @@ int deleteLocationOfUser(LocationBook *book, char* username){
 	}
 
 	return 1;
+}
+
+/* get Locations by owner name
+ * Params:
+ *	 book LocationBook
+ *	 owner string owner name
+ * Return: 
+ *   Location List indexed by owner name
+ *   NULL if not found
+ */
+void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations) {
+	List *locations = getLocationsByOwner(book, owner);
+	ListNode *node;
+	Location *l;
+
+	listTraverse(node, locations) {
+		l = (Location*)node->data;
+		if(l->seen == 0) {
+			insertAtTail(unseenLocations, node->data);
+		}
+	}
+}
+
+/*
+ * get locations of an user indexed by giving page
+ * Params:
+ *   book LocationBook
+ *   username string username
+ *   page int page number
+ *   result array to save the result
+ * Return:
+ *   Number of locations have been gotten
+ */
+int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result){
+	List *unseenLocations = newList();
+	getUnseenLocationsByOwner(book, username, unseenLocations);
+
+	ListNode *node = unseenLocations->root;
+	Location *l;
+	int i;
+
+	// go to desired page
+	for(i = 0; i < (page-1) * PAGE_SIZE; i++){
+		if(node == NULL) return 0;
+		node = node->next;
+	}
+
+	for(i = 0; i < PAGE_SIZE; i++) {
+		if(node == NULL) break;
+		l = (Location*)node->data;
+		l->seen = 1;
+		result[i] = *l;
+		node = node->next;
+	}
+
+	free(unseenLocations);
+	return i;
 }

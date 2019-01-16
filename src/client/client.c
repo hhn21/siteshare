@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     char *buff = NULL;
     int buffSize;
     Location *location, *locations;
-    int currPage, rs, locationNum;
+    int currPage, rs, locationNum, printLabel;
     Location locationArr[10];
 
     Request req;
@@ -388,21 +388,38 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME;
                     break;
                 }
-                buff = malloc(strlen(username) + 1);
-                strcpy(buff, username);
-                req.opcode = FETCH;
-                req.length = strlen(username) + 1;
-                req.data = buff;
-                request(socketfd, req, &res);
-                if (res.status == SUCCESS) {
-                    printf("\n~ fetch succeeded TODO: Show 10 new location per page\n");
-                    //TODO: show fetch list in pages
-                    //TODO: hoi nguoi dung co muon luu vao may khong
-                    opt = IOPT_MAINMENU;
-                } else {
-                    printf("\n~ No new location\n");
-                    opt = IOPT_MAINMENU;
-                }
+
+                printf(FETCHING_LOCATIONS);
+                printLabel = 1;
+                currPage = 1;
+                do {
+                    req.opcode = FETCH_UNSEEN;
+                    req.length = sizeof(int);
+                    req.data = &currPage;
+                    request(socketfd, req, &res);
+                    if (res.status == SUCCESS) {
+                        locationNum = res.length / sizeof(Location);
+                        if(locationNum == 0) break;
+                        if(printLabel) {
+                            printLabel = 0;
+                            printLocationLabel();
+                        }
+                        locations = res.data;
+                        for(int i = 0; i < locationNum; i++) {
+                            location = malloc(sizeof(Location));
+                            memcpy(location, &locations[i], sizeof(Location));
+                            addLocationtoBook(locationBook, location);
+                            addNewLocationOfUser(location, username);
+                            printLocationInfo(locations[i], i);
+                        }
+                        free(res.data);
+                    } else {
+                        opt = IOPT_MAINMENU;
+                        free(res.data);
+                        break;
+                    }
+                } while(1);
+                printf(FETCHED_LOCATIONS);
                 opt = IOPT_MAINMENU;
                 free(buff);
                 buff = NULL;

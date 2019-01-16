@@ -105,7 +105,7 @@ void addLocationtoBook(LocationBook* book, Location *location){
 		row->data = newList();
 		insertAtTail(book->ownerList, (void*)row);
 	}
-	insertAtTail(row->data, (void*)location);
+	insertAtHead(row->data, (void*)location);
 
 	// insert to shared list
 	row = _getBookRowBySharer(book, location->sharedBy);
@@ -115,7 +115,7 @@ void addLocationtoBook(LocationBook* book, Location *location){
 		row->data = newList();
 		insertAtTail(book->sharedList, (void*)row);
 	}
-	insertAtTail(row->data, (void*)location);
+	insertAtHead(row->data, (void*)location);
 }
 
 /* 
@@ -181,8 +181,8 @@ int addNewLocationOfUser(Location *l, char *username) {
  *		username string
  */
 int saveLocationOfUser(LocationBook* book, char *username) {
-	BookRow *row;
-	ListNode *node1, *node2;
+	List *locations;
+	ListNode *node;
 	Location *l;
 
 	char filename[100];
@@ -193,14 +193,13 @@ int saveLocationOfUser(LocationBook* book, char *username) {
 	    return 0;
 	}
 	else {
-		listTraverse(node1, book->ownerList) {
-			row = (BookRow*)node1->data;
-			if(strcmp(username, row->key) != 0) continue;
-			listTraverse(node2, row->data){
-				l = (Location*)node2->data;
-				if(fwrite(l, sizeof(Location), 1, fpout) != 1) return 0;
-			}
+		locations = getLocationsByOwner(book, username);
+		reverseList(locations);
+		listTraverse(node, locations){
+			l = (Location*)node->data;
+			if(fwrite(l, sizeof(Location), 1, fpout) != 1) return 0;
 		}
+		reverseList(locations);
 	}
 	fclose(fpout);
 	return 1;
@@ -342,6 +341,7 @@ int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page,
 	for(i = 0; i < PAGE_SIZE; i++) {
 		if(node == NULL) break;
 		l = (Location*)node->data;
+		l->seen = 1;
 		result[i] = *l;
 		node = node->next;
 	}

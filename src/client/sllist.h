@@ -23,13 +23,13 @@ typedef struct List
 /*----------------------Single linked List methods---------------------------------*/
 
 List* newList();                                                // create new List
-ListNode* makeNewNode(void* data);								// create new node
 void insertAtHead(List*, void*);                                // Insert new node at head of list. Params: 1. List pointer, 2. Data pointer
 void insertAtTail(List*, void*);                                // Insert new node at tail of list. Params: 1. List pointer, 2. Data pointer
 void insertAtPosition(List*, void*, int);                       // Insert new node at specific position. Params: 1. List pointer, 2. Data pointer, 3. Position
 void deleteHead(List*);                                         // Delete list head
 void deleteNode(List*, ListNode*);                              // Delete a node
 void deleteAtPosition(List*, int);                              // Delete a node at specific position
+void reverseList(List *list);									// Reverse list
 void destroyList(List* List);                                   // Free list and its data
 
 #define listTraverse(listNode, list) \
