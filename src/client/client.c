@@ -461,7 +461,6 @@ int main(int argc, char** argv) {
                         }
                         free(res.data);
                     } else {
-                        printf("\n%s\n", (char*)res.data);
                         opt = IOPT_MAINMENU;
                         free(res.data);
                         break;
