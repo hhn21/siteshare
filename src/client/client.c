@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     char receiver[ACC_NAME_MAX_LEN];
     char *buff = NULL;
     int buffSize;
-    Location *location, *locations;
+    Location *location, *locations, tmpLocation;
     int currPage, rs, locationNum, printLabel;
     Location locationArr[10];
 
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
             	break;
 
 /******************************** 1. Add location ********************************/
-            case IOPT_ADD: 
+            case IOPT_ADD_LOCAL: 
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
                     printf("\n~ You are not logged in yet!\n");
@@ -198,11 +198,47 @@ int main(int argc, char** argv) {
 
 /******************************** 2. Show local location ********************************/
             case IOPT_SHOW_LOCAL:
+                //authentication
+                if(sessionStatus != LOGGED_IN) {
+                    printf("\n~ You are not logged in yet!\n");
+                    opt = IOPT_WELCOME; 
+                    break;
+                }
+
                 location = NULL;
                 opt = showLocalLocation(locationBook, username, &location);
                 if(location != NULL) {
-                    // TODO: selected 1 location
+                    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+                    printf("Location:\n");
+                    printLocationLabel();
+                    printLocationInfo(*location, 1);
+                    opt = locationUpdateMenu();
                 }
+                break;
+
+/******************************** 2. Update local location ********************************/
+            case IOPT_UPDATE_LOCAL:
+                //authentication
+                if(sessionStatus != LOGGED_IN) {
+                    printf("\n~ You are not logged in yet!\n");
+                    opt = IOPT_WELCOME; 
+                    break;
+                }
+                printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+                printf("Location:\n");
+                printLocationLabel();
+                printLocationInfo(*location, 1);
+                inputUpdateLocationInfo(*location, &tmpLocation);
+                strcpy(location->category, tmpLocation.category);
+                strcpy(location->name, tmpLocation.name);
+                strcpy(location->note, tmpLocation.note);
+                saveLocationOfUser(locationBook, username);
+                printf("Updated location\n");
+                opt = IOPT_MAINMENU;
+                break;
+
+/******************************** 2. Update local location ********************************/
+            case IOPT_DELETE_LOCAL:
                 break;
 
 /******************************** 3. Show server location ********************************/
@@ -242,10 +278,13 @@ int main(int argc, char** argv) {
                             }
                             currPage += 1; continue; 
                         }
-                        // TODO: selected 1 location
-                        if(rs >= 0) {
+                        if(rs == 0) {
                             opt = IOPT_MAINMENU;
                             break; 
+                        }
+                        // TODO: selected 1 location
+                        if(rs > 0) {
+
                         }
                     } else {
                         opt = IOPT_MAINMENU;
@@ -327,7 +366,6 @@ int main(int argc, char** argv) {
                         request(socketfd, req, &res);
 
                         //receive response from server
-                        
                         if (res.status != SUCCESS) {
                             opt = IOPT_MAINMENU;
                             break;

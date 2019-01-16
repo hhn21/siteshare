@@ -166,7 +166,7 @@ void printMainMenu(char username[]){
  *  Params:
  *      username
  *  Return: Option
- *      IOPT_ADD;
+ *      IOPT_ADD_LOCAL;
  *      IOPT_SHOW_LOCAL;
  *      IOPT_SHOW_SERVER;
  *      IOPT_SHARE;
@@ -190,7 +190,7 @@ Option mainMenu(char username[]){
     } while (opt < 1 || opt > 8);
 
     switch(opt) {
-        case 1: return IOPT_ADD;
+        case 1: return IOPT_ADD_LOCAL;
         case 2: return IOPT_SHOW_LOCAL;
         case 3: return IOPT_SHOW_SERVER;
         case 4: return IOPT_SHARE;
@@ -225,13 +225,13 @@ void printCategoryList() {
     printf("...)\n");
 }
 
-/* case: IOPT_ADD
+/* case: IOPT_ADD_LOCAL
  * input location info
  *  Params:
  *      Location* location
  *
  *  Return: Option
- *      IOPT_ADD (if succeed, continue)
+ *      IOPT_ADD_LOCAL (if succeed, continue)
  *      IOPT_MAINMENU (if user input nothing)
  */
 Option inputLocationInfo(Location *location){
@@ -261,7 +261,7 @@ Option inputLocationInfo(Location *location){
         return IOPT_MAINMENU;
     }
 
-    return IOPT_ADD;
+    return IOPT_ADD_LOCAL;
 }
 
 
@@ -505,4 +505,72 @@ Option confirmRestoreLocation(){
     } while (1);
     
     return IOPT_MAINMENU;
+}
+
+void printUpdateMenu(){
+    printf("\n\n(Location Screen)\n");
+    printf("1. Update\n");
+    printf("2. Delete\n");
+    printf("3. Exit\n");
+    printf("----------\n");
+    printf("Please choose 1, 2 or 3\n");
+    printf("Your choice: ");
+}
+
+Option locationUpdateMenu() {
+    char buf[OPT_MAX_LEN];
+    int opt = 0;
+    do {
+        printUpdateMenu();
+        fgets(buf, OPT_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+
+        opt = atoi(buf);
+        if (buf[0] == '\0') {
+            printf("\n~ You input nothing, if u wish to exit, please choose 3\n");
+        }
+        else if (opt < 1 || opt > 3) {
+            printf("\n~ Wrong input, please choose a number, from 1 to 3\n");
+        }
+    } while(opt < 1 || opt > 3);
+    switch(opt) {
+        case 1: return IOPT_UPDATE_LOCAL;
+        case 2: return IOPT_DELETE_LOCAL;
+        case 3: return IOPT_MAINMENU;
+    }
+    return IOPT_MAINMENU;
+}
+
+
+/* case: IOPT_UPDATE_LOCAL
+ * input location info
+ *  Params:
+ *      Location* location
+ *
+ *  Return: Option
+ *      IOPT_UPDATE_LOCAL
+ */
+Option inputUpdateLocationInfo(Location old, Location *new){
+    printf("Input Category. ");
+    printCategoryList();
+    printf("Location Category (%s): ", old.category);
+    fgets(new->category, L_CAT_MAX_LEN, stdin);
+    new->category[strlen(new->category) - 1] = '\0';
+    if (new->category[0] == '\0') {
+        strcpy(new->category, old.category);
+    }
+    printf("Location Name (%s): ", old.name);
+    fgets(new->name, L_NAME_MAX_LEN, stdin);
+    new->name[strlen(new->name) - 1] = '\0';
+    if (new->name[0] == '\0') {
+        strcpy(new->name, old.name);
+    }
+    printf("Location Note (%s): ", old.note);
+    fgets(new->note, L_NOTE_NAME_MAX_LEN, stdin);
+    new->note[strlen(new->note) - 1] = '\0';
+    if (new->note[0] == '\0') {
+        strcpy(new->note, old.note);
+    }
+
+    return IOPT_UPDATE_LOCAL;
 }
