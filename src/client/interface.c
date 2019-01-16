@@ -237,8 +237,8 @@ void printCategoryList() {
  */
 Option inputLocationInfo(Location *location){
     printf(SCREEN_SPLITTER);
-    printf("(Add location form. Note: Leave a blank input if you wish to quit)\n");
-    printf("Input Category. ");
+    printf(ADD_LOCATION_INS);
+    printf("Input Category ");
     printCategoryList();
     printf("Location Category: ");
     fgets(location->category, L_CAT_MAX_LEN, stdin);
@@ -337,6 +337,28 @@ void printLocationInfo(Location l, int index){
     printf("%-5d %-30s %-30s %-30s %-30s %-30s\n", index, timeString, l.category, l.name, l.note, l.sharedBy);
 }
 
+
+/* input page navigation commands
+ * Return:
+ *      -2 if inputed \p
+ *      -1 if inputed \n
+ *      0 if inputed nothing
+ */
+int pageNavigateNoNumber() {
+    char buf[OPT_MAX_LEN];
+
+    while(1) {
+        printf("\n\nYour choise (Enter to quit): ");
+        fgets(buf, OPT_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+
+        if(strcmp(buf, "\\p") == 0) return -2;
+        if(strcmp(buf, "\\n") == 0) return -1;
+        if(buf[0] == '\0') return 0;
+    }
+    return 1;
+}
+
 /* input page navigation commands
  * Params:
  *      min min value of number input
@@ -397,12 +419,12 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
         return IOPT_MAINMENU;
     }
     printf(SCREEN_SPLITTER);
-    printf("Viewing local locations");
+    printf(VIEW_LOCAL);
     printLocationLabel();
     listTraverse(node2, locations){
-        l = (Location*)node2->data;
-        l_a[j] = l;
         j = j % 10 + 1;
+        l = (Location*)node2->data;
+        l_a[j - 1] = l;
         printLocationInfo(*l, j);
         printPageInfo = 1;
         if(j % 10 == 0 || node2->next == NULL) { // if reach the end of page or the end of list 
@@ -427,6 +449,8 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
                     node2 = &tmp;
                     for(int i = 0; i < (currPage - 1) * 10; i++) node2 = node2->next;
                     j = 0;
+                    printf(SCREEN_SPLITTER);
+                    printf(VIEW_LOCAL);
                     printLocationLabel();
                     break;
                 }
@@ -439,6 +463,8 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
                         continue;
                     }
                     currPage += 1;
+                    printf(SCREEN_SPLITTER);
+                    printf(VIEW_LOCAL);
                     printLocationLabel();
                     break;
                 }

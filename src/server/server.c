@@ -116,7 +116,7 @@ int shareLocation(Session *session, Request req){
 		free(location);
 		return -2;
 	}
-	if(strcmp(receiver,session->user.username)) { // validate receiver
+	if(!strcmp(receiver,session->user.username)) { // validate receiver
 		free(location);
 		return -3;
 	}
@@ -265,14 +265,14 @@ void* handler(void *arg){
 					pthread_mutex_unlock(&locationDBMutex);
 				}
 
-				if(rs >= 0){
+				if(rs > 0){
 					res.status = SUCCESS;
 					res.length = rs * sizeof(Location);
 					res.data = locationArr;
 				} else {
 					res.status = ERROR;
-					res.length = 0;
-					res.data = ""; 
+					res.length = strlen(FETCH_FAIL)+1;
+					res.data = FETCH_FAIL; 
 				}
 				break;
 			case DELETE_LOCATIONS:

@@ -41,7 +41,7 @@
 #define RESTORE_FAIL 					"~ Restore failed"
 
 #define FETCH_SUCCESS 					"~ Fetch unseen locations successfully"
-#define FETCH_FAIL 						"~ Fetch unseen locations failed"
+#define FETCH_FAIL 						"~ No more location from friends found..."
 
 
 typedef int RequestLengthType;

@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
                 opt = showLocalLocation(locationBook, username, &location);
                 if(location != NULL) {
                     printf(SCREEN_SPLITTER);
-                    printf("Updating locations:\n");
+                    printf(UPDATING_LOCATION);
                     printLocationLabel();
                     printLocationInfo(*location, 1);
                     opt = locationUpdateMenu();
@@ -225,7 +225,7 @@ int main(int argc, char** argv) {
                     break;
                 }
                 printf(SCREEN_SPLITTER);
-                printf("Updating Location:\n");
+                printf(UPDATING_LOCATION);
                 printLocationLabel();
                 printLocationInfo(*location, 1);
                 inputUpdateLocationInfo(*location, &tmpLocation);
@@ -239,6 +239,14 @@ int main(int argc, char** argv) {
 
 /******************************** 2. Delete local location ********************************/
             case IOPT_DELETE_LOCAL:
+                printf(SCREEN_SPLITTER);
+                printf(DELETING_LOCATION);
+                printLocationLabel();
+                printLocationInfo(*location, 1);
+                deleteALocationOfUser(locationBook, username, location);
+                saveLocationOfUser(locationBook, username);
+                printf("Deleted location\n");
+                opt = IOPT_MAINMENU;
                 break;
 
 /******************************** 3. Show server location ********************************/
@@ -253,7 +261,7 @@ int main(int argc, char** argv) {
                         locationNum = res.length / sizeof(Location);
                         if(locationNum > 0) {
                             printf(SCREEN_SPLITTER);
-                            printf("Viewing Server locations:\n");
+                            printf(VIEW_SERVER);
                             printLocationLabel();
                             locations = res.data;
                             for(int i = 0; i < locationNum; i++) {
@@ -265,7 +273,7 @@ int main(int argc, char** argv) {
                         printf("Page %d ", currPage);
                         if(currPage > 1) printf(PREV_PAGE_HOW);
                         if(locationNum == PAGE_SIZE) printf(NEXT_PAGE_HOW);
-                        rs = pageNavigate(1, locationNum);
+                        rs = pageNavigateNoNumber();
                         if(rs == -2) { 
                             if(currPage == 1) {
                                 printf(NO_PREV_PAGE);
@@ -283,10 +291,6 @@ int main(int argc, char** argv) {
                         if(rs == 0) {
                             opt = IOPT_MAINMENU;
                             break; 
-                        }
-                        // TODO: selected 1 location
-                        if(rs > 0) {
-
                         }
                     } else {
                         opt = IOPT_MAINMENU;
@@ -430,7 +434,6 @@ int main(int argc, char** argv) {
                     break;
                 }
 
-                printf(FETCHING_LOCATIONS);
                 printLabel = 1;
                 currPage = 1;
                 do {
@@ -438,13 +441,14 @@ int main(int argc, char** argv) {
                     req.length = sizeof(int);
                     req.data = &currPage;
                     request(socketfd, req, &res);
+                    
                     if (res.status == SUCCESS) {
                         locationNum = res.length / sizeof(Location);
                         if(locationNum == 0) break;
                         if(printLabel) {
                             printLabel = 0;
                             printf(SCREEN_SPLITTER);
-                            printf("Viewing new Sites from fellow Site sharer:\n");
+                            printf(VIEW_FETCHED);
                             printLocationLabel();
                         }
                         locations = res.data;
@@ -457,12 +461,12 @@ int main(int argc, char** argv) {
                         }
                         free(res.data);
                     } else {
+                        printf("\n%s\n", (char*)res.data);
                         opt = IOPT_MAINMENU;
                         free(res.data);
                         break;
                     }
                 } while(1);
-                printf(FETCHED_LOCATIONS);
                 opt = IOPT_MAINMENU;
                 free(buff);
                 buff = NULL;

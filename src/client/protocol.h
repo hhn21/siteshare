@@ -27,7 +27,11 @@
 #define USER_NO_LOCATION "\n~ You don't have any location\n"
 #define ASK_SURE_DELETE_SERVER "\n~ This operation will delete all locations on server!\n~ Do you want to continue? (y/n): "
 #define ASK_SURE_DELETE_LOCAL "\n~ This operation will delete all local locations!\n~ Do you want to continue? (y/n): "
-
+#define VIEW_SERVER "Viewing Server locations:\n"
+#define VIEW_LOCAL "Viewing local locations:\n"
+#define UPDATING_LOCATION "Updating locations:\n"
+#define DELETING_LOCATION "Deleting location:\n"
+#define VIEW_FETCHED "Viewing new Sites from fellow Site sharer:\n"
 
 #define LOGIN_NOT "\n~ You are not logged in yet!\n" 
 #define ADD_LOCATION_SUCCESS "\n~ New location added! Welldone Site sharer <3\n" 
@@ -39,8 +43,7 @@
 #define SERVER_LOCATION_DELETE_SUCCESS "\n~ Server locations deleted\n"
 #define SAVE_LOCATION_SUCCESS "\n~ Locations saved to server. We got your back ;)\n"
 #define RESTORE_LOCATION_SUCCESS "\n~ Restored locations successfully. Worry not, Site sharer!\n"
-#define FETCHING_LOCATIONS "\n~ fetching unseen locations ...\n"
-#define FETCHED_LOCATIONS "\n~ fetched unseen locations ...\n"
+#define ADD_LOCATION_INS "(Add location form. Note: Leave a blank input if you wish to quit)\n"
 
 #define FAREWELL "\nFarewell Site sharer\n\n"
 

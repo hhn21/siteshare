@@ -70,13 +70,39 @@ void deleteHead(List *list){
 }
 
 void deleteNode(List *list, ListNode *node){
+    if(list->root == node) {
+        deleteHead(list);
+        return;
+    }
+
     ListNode *tmp = list->root;
     ListNode *prev = NULL;
 
     while(tmp != NULL) {
         if(tmp == node) {
-            if(prev != NULL) prev->next = tmp->next;
+            prev->next = tmp->next;
             free(tmp);
+            break;
+        }
+        prev = tmp;
+        tmp = tmp->next;
+    }
+}
+
+void deleteNodeByData(List* list, void *data){
+    if(list->root->data == data) {
+        deleteHead(list);
+        return;
+    }
+
+    ListNode *tmp = list->root;
+    ListNode *prev = NULL;
+
+    while(tmp != NULL) {
+        if(tmp->data == data) {
+            prev->next = tmp->next;
+            free(tmp);
+            printf("Deleted node\n");
             break;
         }
         prev = tmp;
