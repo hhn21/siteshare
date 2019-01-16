@@ -150,18 +150,7 @@ int deleteLocationOfUser(LocationBook *book, char* username);
  *   Location List indexed by owner name
  *   NULL if not found
  */
-void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations) {
-    List *locations = getLocationsByOwner(book, username);
-    ListNode *node;
-    Location *l;
-
-    listTraverse(node, locations) {
-        l = (Location*)node->data;
-        if(l->seen == 0) {
-            insertAtTail(unseenLocations, node->data);
-        }
-    }
-}
+void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations);
 
 /*
  * get locations of an user indexed by giving page
@@ -173,6 +162,6 @@ void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLoca
  * Return:
  *   Number of locations have been gotten
  */
-int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result)
+int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result);
 
 #endif

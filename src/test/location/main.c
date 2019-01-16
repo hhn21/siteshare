@@ -43,7 +43,7 @@ int inputLocationInfo(Location *location){
 
 int main(){
 	LocationBook *locationBook = newLocationBook();
-	char username[] = "anhkhoa45";
+	char username[] = "tungbt";
 	int locationNum = 0;
 	Location *l;
 	BookRow *row;
@@ -69,32 +69,33 @@ int main(){
     // addLocationtoBook(locationBook, location); // add location to in-memory book
     // addNewLocationOfUser(location, username); // save location to db
 
-    // listTraverse(node1, locationBook->ownerList) {
-    //  row = (BookRow*)node1->data;
-    //  printf("Owner: %s\n", row->key);
-    //  listTraverse(node2, row->data){
-    //      l = (Location*)node2->data;
-    //      printf("'%s' %ld '%s' '%s' '%s' %d\n", l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
-    //  }
-    // }
-
 
 	// print book data
-	listTraverse(node1, locationBook->ownerList) {
-		row = (BookRow*)node1->data;
-		printf("Owner: %s\n", row->key);
-		listTraverse(node2, row->data){
-            idx++;
-			l = (Location*)node2->data;
-			printf("%d '%s' %ld '%s' '%s' '%s' %d\n", idx, l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
-		}
-	}
+	// listTraverse(node1, locationBook->ownerList) {
+	// 	row = (BookRow*)node1->data;
+	// 	printf("Owner: %s\n", row->key);
+	// 	listTraverse(node2, row->data){
+ //            idx++;
+	// 		l = (Location*)node2->data;
+	// 		printf("%d '%s' %ld '%s' '%s' '%s' %d\n", idx, l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+	// 	}
+	// }
 
 	
     // get location by page
+    // printf("get location by page\n");
+    // Location la[PAGE_SIZE];
+    // int rs = getLocationsOfUserByPage(locationBook, username, 2, la);
+
+    // for(int i = 0; i < rs; i++) {
+    //     l = &la[i];
+    //     printf("%d '%s' %ld '%s' '%s' '%s' %d\n", i+1, l->sharedBy, l->createdAt, l->category, l->name, l->note, l->seen);
+    // }
+
+    // get unseen location by page
     printf("get location by page\n");
     Location la[PAGE_SIZE];
-    int rs = getLocationsOfUserByPage(locationBook, username, 2, la);
+    int rs = getUnseenLocationsOfUserByPage(locationBook, username, 1, la);
 
     for(int i = 0; i < rs; i++) {
         l = &la[i];

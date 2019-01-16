@@ -303,7 +303,7 @@ int deleteLocationOfUser(LocationBook *book, char* username){
  *   NULL if not found
  */
 void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations) {
-	List *locations = getLocationsByOwner(book, username);
+	List *locations = getLocationsByOwner(book, owner);
 	ListNode *node;
 	Location *l;
 
@@ -331,7 +331,7 @@ int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page,
 
 	ListNode *node = unseenLocations->root;
 	Location *l;
-	int i, j;
+	int i;
 
 	// go to desired page
 	for(i = 0; i < (page-1) * PAGE_SIZE; i++){
@@ -345,7 +345,7 @@ int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page,
 		result[i] = *l;
 		node = node->next;
 	}
-	
+
 	free(unseenLocations);
 	return i;
 }

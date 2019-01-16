@@ -299,7 +299,7 @@ void* handler(void *arg){
 			default:
 				break;
 		}
-		response(connSock, res);
+		if(response(connSock, res) < 0) break;
 	}
 
 	// delete client session
