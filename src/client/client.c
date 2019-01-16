@@ -15,8 +15,43 @@
 #include "location.h"
 #include "sllist.h"
 #include "protocol.h"
-#include "func.h"
+#include "interface.h"
 
+
+/*
+ * add username\npassword to buff and return buffsize
+ *  params:
+ *      char* username
+ *      char* password
+ *      char** buff
+ *  return: int
+ *      buffsize
+ */
+int makeAuthDataBuff(char* username, char* password, char** buff) {
+    int buffSize;
+    buffSize = strlen(username) + strlen(password) + 2;
+    *buff = malloc(buffSize);
+    sprintf(*buff, "%s\n%s", username, password);
+    return buffSize;
+}
+
+/*
+ * add location and receiver to buff and return buffsize
+ *  params:
+ *      char* receiver
+ *      Location* location
+ *      char** buff
+ *  return: int
+ *      buffsize
+ */
+int makeShareDataBuff(char* receiver, Location *location, char** buff) {
+    int buffSize;
+    buffSize = strlen(receiver) + sizeof(Location) + 2;
+    *buff = malloc(buffSize);
+    memcpy(*buff, location, sizeof(Location));
+    memcpy(*buff + sizeof(Location), receiver, strlen(receiver) + 1);
+    return buffSize;
+}
 
 int main(int argc, char** argv) {
 	/********************************************* Process arguments *********************************************************/
@@ -43,7 +78,7 @@ int main(int argc, char** argv) {
 	}
 
 	//Step 4: Communicate with server
-	LocationBook *locationBook;
+	LocationBook *locationBook = NULL;
     SessionStatus sessionStatus = UNAUTHENTICATED;
 	char username[ACC_NAME_MAX_LEN];
     char password[ACC_NAME_MAX_LEN];
@@ -102,6 +137,7 @@ int main(int argc, char** argv) {
             	}
             	free(buff);
             	buff = NULL;
+                free(res.data);
             	break;
 
 /******************************** 2. Sign up ********************************/
@@ -126,6 +162,7 @@ int main(int argc, char** argv) {
             	}
                 free(buff);
                 buff = NULL;
+                free(res.data);
             	break;
 
 /******************************** 5. Log out ********************************/
@@ -156,10 +193,7 @@ int main(int argc, char** argv) {
                     opt = IOPT_MAINMENU;
                 }
                 buff = NULL;
-            	break;
-
-/******************************** 3. 6. Exit ********************************/
-            case IOPT_EXIT:
+                free(res.data);
             	break;
 
 /******************************** 1. Add location ********************************/
@@ -194,7 +228,17 @@ int main(int argc, char** argv) {
                 opt = IOPT_MAINMENU;
             	break;
 
-/******************************** 2. Share location ********************************/
+/******************************** 2. Show local location ********************************/
+            case IOPT_SHOW_LOCAL:
+                opt = showLocalLocation(locationBook, username, &location);
+                break;
+
+/******************************** 2. Show server location ********************************/
+            case IOPT_SHOW_SERVER:
+                // opt = showLocalLocation(locationBook, username);
+                break;
+
+/******************************** 3. Share location ********************************/
             case IOPT_SHARE:
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
@@ -225,6 +269,7 @@ int main(int argc, char** argv) {
                 opt = IOPT_MAINMENU;
                 free(buff);
                 buff = NULL;
+                free(res.data);
             	break;
 
 /******************************** 3. Save to server ********************************/
@@ -248,6 +293,7 @@ int main(int argc, char** argv) {
                         break;
                     }
                     printf("Deleted locations on server\n");
+                    free(res.data);
                     // send locations to server
                     currPage = 1;
                     do {
@@ -262,6 +308,7 @@ int main(int argc, char** argv) {
                             opt = IOPT_MAINMENU;
                             break;
                         }
+                        free(res.data);
                     } while(rs > 0);
                     printf("Saved locations on server\n");
                     opt = IOPT_MAINMENU;
@@ -298,8 +345,10 @@ int main(int argc, char** argv) {
                                 addLocationtoBook(locationBook, location);
                                 addNewLocationOfUser(location, username);
                             }
+                            free(res.data);
                         } else {
                             opt = IOPT_MAINMENU;
+                            free(res.data);
                             break;
                         }
                         currPage++;
@@ -337,12 +386,21 @@ int main(int argc, char** argv) {
                 free(buff);
                 buff = NULL;
                 break;
+
+/******************************** 3. 6. Exit ********************************/
+            case IOPT_EXIT:
+                break;
         }
         if (opt == IOPT_EXIT) {
             printf("\nFarewell Site sharer\n\n");
         }
     } while(opt != IOPT_EXIT);
 
+    // free location book
+    if(locationBook != NULL) 
+        destroyLocationBook(locationBook);
+    // close socket connection
 	close(socketfd);
+
 	return 0;
 }

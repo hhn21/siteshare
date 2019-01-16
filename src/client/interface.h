@@ -15,6 +15,8 @@ typedef enum {
     IOPT_WELCOME, //welcome screen, see printWelcomeScreen()
     IOPT_MAINMENU, // home screen, see print Main menu
     IOPT_ADD,
+    IOPT_SHOW_LOCAL,
+    IOPT_SHOW_SERVER,
     IOPT_SHARE,
     IOPT_SAVE,
     IOPT_RESTORE,
@@ -130,5 +132,7 @@ Option confirmSaveLocation();
  *      IOPT_RESTORE if confirm
  */
 Option confirmRestoreLocation();
+
+Option showLocalLocation(LocationBook *locationBook, char *username, Location **location);
 
 #endif
