@@ -105,7 +105,7 @@ void addLocationtoBook(LocationBook* book, Location *location){
 		row->data = newList();
 		insertAtTail(book->ownerList, (void*)row);
 	}
-	insertAtTail(row->data, (void*)location);
+	insertAtHead(row->data, (void*)location);
 
 	// insert to shared list
 	row = _getBookRowBySharer(book, location->sharedBy);
