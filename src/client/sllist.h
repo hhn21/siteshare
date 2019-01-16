@@ -23,7 +23,7 @@ typedef struct List
 /*----------------------Single linked List methods---------------------------------*/
 
 List* newList();                                                // create new List
-ListNode* makeNewNode(void* data)								// create new node
+ListNode* makeNewNode(void* data);				// create new node
 void insertAtHead(List*, void*);                                // Insert new node at head of list. Params: 1. List pointer, 2. Data pointer
 void insertAtTail(List*, void*);                                // Insert new node at tail of list. Params: 1. List pointer, 2. Data pointer
 void insertAtPosition(List*, void*, int);                       // Insert new node at specific position. Params: 1. List pointer, 2. Data pointer, 3. Position
