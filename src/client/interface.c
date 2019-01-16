@@ -316,13 +316,16 @@ Option selectLocationToShare(LocationBook *book, char *username, Location **loca
     return showLocalLocation(book, username, location);
 }
 
-
-
-/****************************** Show location ******************************/
+/* Print location table labels*/
 void printLocationLabel() {
-    printf("\n%-5s %-30s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
+    printf("\n%-5s %-30s %-30s %-30s %-30s %-30s\n", "#", "Created at", "Category", "Name", "Note", "Shared by");
 }
 
+/* Print location table info
+ * Params:
+ *      l Location to print
+ *      index index of location
+ */
 void printLocationInfo(Location l, int index){
     char timeString[26];
     struct tm* tm_info;
@@ -330,9 +333,51 @@ void printLocationInfo(Location l, int index){
     tm_info = localtime(&(l.createdAt));
     strftime(timeString, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    printf("%-5d %-30s %-30s %-30s %-50s \n", index, timeString, l.category, l.name, l.note);
+    printf("%-5d %-30s %-30s %-30s %-30s %-30s\n", index, timeString, l.category, l.name, l.note, l.sharedBy);
 }
 
+/* input page navigation commands
+ * Params:
+ *      min min value of number input
+ *      max max value of number input
+ * Return:
+ *      -2 if inputed \p
+ *      -1 if inputed \n
+ *      0 if inputed nothing
+ *      > 0 value if inputed a number within [min,max] 
+ */
+int pageNavigate(int min, int max) {
+    int opt;
+    char buf[OPT_MAX_LEN];
+
+    while(1) {
+        printf("\n\nChoose location (%d-%d), enter to quit: ", min, max);
+        fgets(buf, OPT_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+
+        if(strcmp(buf, "\\p") == 0) return -2;
+        if(strcmp(buf, "\\n") == 0) return -1;
+        if(buf[0] == '\0') return 0;
+        opt = atoi(buf);
+        if(opt < min || opt > max) {
+            printf("Invalid input, please try again\n");
+            continue;
+        }
+    }
+    return 0;
+}
+
+/* input page navigation commands
+ * Params:
+ *      book LocationBook
+ *      username
+ *      location selected location - set to NULL if not selected
+ * Return:
+ *      -2 if inputed \p
+ *      -1 if inputed \n
+ *      0 if inputed nothing
+ *      > 0 value if inputed a number within [min,max] 
+ */
 Option showLocalLocation(LocationBook *book, char *username, Location **location){
     List *locations;
     ListNode *node2;
@@ -340,8 +385,7 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
     Location *l;
     Location *l_a[10];
     int j = 0;
-    char buf[OPT_MAX_LEN];
-    int opt = 0;
+    int pageCmd = 0;
     int currPage = 1;
     int printPageInfo;
 
@@ -362,15 +406,13 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
             do {
                 if(printPageInfo == 1) {
                     printf("\nPage %d \t", currPage);
-                    if(currPage > 1) printf("Type '\\p' to prev page, ");
+                    if(currPage > 1) printf("Type '\\p' to prev page ");
                     if(node2->next != NULL) printf("Type '\\n' to next page");
                 }
-                printf("\n\nChoose location (1-%d), enter to quit: ", j);
-                fgets(buf, OPT_MAX_LEN, stdin);
-                buf[strlen(buf) - 1] = '\0';
+                pageCmd = pageNavigate(1, j);
 
                 // if inputed "\p"
-                if(strcmp(buf, "\\p") == 0) {
+                if(pageCmd == -2) {
                     if(currPage == 1) {
                         printf("Error. No previous page!\n");
                         printPageInfo = 0;
@@ -387,7 +429,7 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
                 }
 
                 // if inputed "\n"
-                if(strcmp(buf, "\\n") == 0) {
+                if(pageCmd == -1) {
                     if(node2->next == NULL) {
                         printf("Error. Reached the end of result!\n");
                         printPageInfo = 0;
@@ -399,20 +441,14 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
                 }
 
                 // if inputed "\0" (blank)
-                if(buf[0] == '\0') {
+                if(pageCmd == 0) {
                     printf("You input nothing, which means back\n");
                     *location = NULL;
                     return IOPT_MAINMENU;
                 }
 
                 // else
-                opt = atoi(buf);
-                if(opt < 1 || opt > j) {
-                    printf("Invalid input, please try again\n");
-                    printPageInfo = 0;
-                    continue;
-                }
-                *location = l_a[opt - 1];
+                *location = l_a[pageCmd - 1];
                 return IOPT_SHARE;
             } while (1);
         }

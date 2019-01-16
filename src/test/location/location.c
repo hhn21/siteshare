@@ -293,3 +293,59 @@ int deleteLocationOfUser(LocationBook *book, char* username){
 
 	return 1;
 }
+
+/* get Locations by owner name
+ * Params:
+ *	 book LocationBook
+ *	 owner string owner name
+ * Return: 
+ *   Location List indexed by owner name
+ *   NULL if not found
+ */
+void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations) {
+	List *locations = getLocationsByOwner(book, username);
+	ListNode *node;
+	Location *l;
+
+	listTraverse(node, locations) {
+		l = (Location*)node->data;
+		if(l->seen == 0) {
+			insertAtTail(unseenLocations, node->data);
+		}
+	}
+}
+
+/*
+ * get locations of an user indexed by giving page
+ * Params:
+ *   book LocationBook
+ *   username string username
+ *   page int page number
+ *   result array to save the result
+ * Return:
+ *   Number of locations have been gotten
+ */
+int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result){
+	List *unseenLocations = newList();
+	getUnseenLocationsByOwner(book, username, unseenLocations);
+
+	ListNode *node = unseenLocations->root;
+	Location *l;
+	int i, j;
+
+	// go to desired page
+	for(i = 0; i < (page-1) * PAGE_SIZE; i++){
+		if(node == NULL) return 0;
+		node = node->next;
+	}
+
+	for(i = 0; i < PAGE_SIZE; i++) {
+		if(node == NULL) break;
+		l = (Location*)node->data;
+		result[i] = *l;
+		node = node->next;
+	}
+	
+	free(unseenLocations);
+	return i;
+}
