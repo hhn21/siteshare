@@ -239,6 +239,14 @@ int main(int argc, char** argv) {
 
 /******************************** 2. Update local location ********************************/
             case IOPT_DELETE_LOCAL:
+                printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+                printf("Location:\n");
+                printLocationLabel();
+                printLocationInfo(*location, 1);
+                deleteALocationOfUser(locationBook, username, location);
+                saveLocationOfUser(locationBook, username);
+                printf("Deleted location\n");
+                opt = IOPT_MAINMENU;
                 break;
 
 /******************************** 3. Show server location ********************************/
@@ -258,12 +266,12 @@ int main(int argc, char** argv) {
                                 printLocationInfo(locations[i], i + 1);
                             }
                         } else {
-                            printf("\n\nNo reults\n");
+                            printf("\n\nNo results\n");
                         }
                         printf("Page %d ", currPage);
                         if(currPage > 1) printf("Type '\\p' to prev page ");
                         if(locationNum == PAGE_SIZE) printf("Type '\\n' to next page");
-                        rs = pageNavigate(1, locationNum);
+                        rs = pageNavigateNoNumber();
                         if(rs == -2) { 
                             if(currPage == 1) {
                                 printf("Error! No previous page!\n");
@@ -281,10 +289,6 @@ int main(int argc, char** argv) {
                         if(rs == 0) {
                             opt = IOPT_MAINMENU;
                             break; 
-                        }
-                        // TODO: selected 1 location
-                        if(rs > 0) {
-
                         }
                     } else {
                         opt = IOPT_MAINMENU;

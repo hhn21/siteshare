@@ -198,6 +198,14 @@ void printLocationInfo(Location l, int index);
  *      -2 if inputed \p
  *      -1 if inputed \n
  *      0 if inputed nothing
+ */
+int pageNavigateNoNumber();
+
+/* input page navigation commands
+ * Return:
+ *      -2 if inputed \p
+ *      -1 if inputed \n
+ *      0 if inputed nothing
  *      > 0 value if inputed a number within [min,max] 
  */
 int pageNavigate(int min, int max);

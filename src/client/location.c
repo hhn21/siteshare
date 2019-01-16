@@ -349,3 +349,20 @@ int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page,
 	free(unseenLocations);
 	return i;
 }
+
+
+/*
+ * delete a location of an user (first location found in book)
+ * Params:
+ *   book LocationBook
+ *   username string username
+ *   location pointer to a location to delete
+ * Return:
+ *   Number of locations have been gotten
+ */
+int deleteALocationOfUser(LocationBook *book, char* username, Location *location){
+	List *locations = getLocationsByOwner(book, username);
+	if(locations == NULL) return 0;
+	deleteNodeByData(locations, location);
+	return 1;
+}
