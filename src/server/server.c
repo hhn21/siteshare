@@ -40,15 +40,19 @@ int authenticate(Session *session, char* credentials) {
 	Account *a;
 
 	sscanf(credentials, "%s\n%s", username, password);
+	pthread_mutex_lock(&accountListMutex);
 	a = findAccountByName(accountList, username);
 	if(a != NULL) {
 		if(strcmp(a->password, password) == 0) {
 			session->status = LOGGED_IN;
 			session->user = *a;
+			pthread_mutex_unlock(&accountListMutex);
 			return 1;
 		}
+		pthread_mutex_unlock(&accountListMutex);
 		return -1;
 	}
+	pthread_mutex_unlock(&accountListMutex);
 	return 0;
 }
 
@@ -56,6 +60,7 @@ int authenticate(Session *session, char* credentials) {
  * params:
  *		credentials: "username\npassword" form string
  * return:
+ *		-1 if username or password is invalid
  *		0 if signup fail
  *		1 if signup success
  */
@@ -66,6 +71,8 @@ int signup(char* credentials) {
 	int rs = 0;
 
 	sscanf(credentials, "%s\n%s", username, password);
+	if(!validateUsername(username) || !validatePassword(password)) 
+		return -1;
 	pthread_mutex_lock(&accountListMutex);
 	a = findAccountByName(accountList, username);
 	if(a == NULL) {
@@ -115,6 +122,10 @@ int shareLocation(Session *session, Request req){
 	if(findAccountByName(accountList, receiver) == NULL) { // validate receiver
 		free(location);
 		return -2;
+	}
+	if(!strcmp(receiver,session->user.username)) { // validate receiver
+		free(location);
+		return -3;
 	}
 	strcpy(location->sharedBy, location->owner);
 	strcpy(location->owner, receiver);
@@ -181,6 +192,7 @@ void* handler(void *arg){
 	int rs;			//result, determind what to send back to user
 
 	Location locationArr[PAGE_SIZE];
+	Account userArr[ACC_PAGE_SIZE];
 
 	while(1) {
 		if(fetchRequest(connSock, &req) < 0) break;
@@ -205,14 +217,18 @@ void* handler(void *arg){
 				break;
 			case SIGNUP:
 				rs = signup(req.data);
-				if(rs) { 
+				if(rs == 1) { 
 					res.status = SUCCESS;
 					res.length = strlen(SIGNUP_SUCCESS)+1;
 					res.data = SIGNUP_SUCCESS; 
-				} else  { 
+				} else if(rs == 0) { 
 					res.status = ERROR;
 					res.length = strlen(SIGNUP_FAIL_USERNAME_EXIST)+1;
 					res.data = SIGNUP_FAIL_USERNAME_EXIST; 
+				} else if(rs == -1) { 
+					res.status = ERROR;
+					res.length = strlen(SIGNUP_FAIL_CREDENTIAL_INVALID)+1;
+					res.data = SIGNUP_FAIL_CREDENTIAL_INVALID; 
 				}
 				break;
 			case LOGOUT:
@@ -229,12 +245,22 @@ void* handler(void *arg){
 				break;
 			case SHARE_LOCATION:
 				rs = shareLocation(session, req);
-				if(rs) { 
+				if(rs == 1) { 
 					res.status = SUCCESS;
 					res.length = strlen(SHARE_SUCCESS)+1;
 					res.data = SHARE_SUCCESS; 
-				} else { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; //TODO: check user
+				} else if (rs == -1){
+					res.status = ERROR;
+					res.length = strlen(SHARE_FAIL_AUTH_USER)+1;
+					res.data = SHARE_FAIL_AUTH_USER; 
+				} else if (rs == -2){
+					res.status = ERROR;
+					res.length = strlen(SHARE_FAIL_USERNAME_NOT_EXIST)+1;
+					res.data = SHARE_FAIL_USERNAME_NOT_EXIST; 
+				} else if (rs == -3){
+					res.status = ERROR;
+					res.length = strlen(SHARE_FAIL_CANNOT_SHARE_SELF)+1;
+					res.data = SHARE_FAIL_CANNOT_SHARE_SELF; 
 				}
 				break;
 			case FETCH_UNSEEN:
@@ -251,14 +277,14 @@ void* handler(void *arg){
 					pthread_mutex_unlock(&locationDBMutex);
 				}
 
-				if(rs >= 0){
+				if(rs > 0){
 					res.status = SUCCESS;
 					res.length = rs * sizeof(Location);
 					res.data = locationArr;
 				} else {
 					res.status = ERROR;
-					res.length = 0;
-					res.data = ""; 
+					res.length = strlen(FETCH_FAIL)+1;
+					res.data = FETCH_FAIL; 
 				}
 				break;
 			case DELETE_LOCATIONS:
@@ -300,6 +326,23 @@ void* handler(void *arg){
 					res.data = RESTORE_FAIL; 
 				}
 				break;
+			case GET_USERS:
+				if(session->status != LOGGED_IN) 
+					rs = -1;
+				else {
+					pthread_mutex_lock(&accountListMutex);
+					rs = getUserByPageExcept(accountList, *(int*)req.data, userArr, session->user.username);
+					pthread_mutex_unlock(&accountListMutex);
+				}
+				if(rs >= 0){
+					res.status = SUCCESS;
+					res.length = rs * sizeof(Account);
+					res.data = userArr;
+				} else {
+					res.status = ERROR;
+					res.length = 0;
+					res.data = ""; 
+				}
 			default:
 				break;
 		}

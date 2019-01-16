@@ -18,6 +18,35 @@
 #define FALSE            0
 #define BUFF_SIZE 		 7000
 
+#define ADDRESS_PORT_NEED "\n~ You must run program with address and port number!"
+#define PORT_INVALID "\n~ Invalid port number" 
+#define SERVER_CANNOT_CONNECT "\nError! Can not connect to sever! Client exit imediately!\n" 
+#define SCREEN_SPLITTER "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+#define MENU_SPLITTER "----------\n"
+#define INPUT_NOTHING_TO_BACK "\n~ You input nothing, which means back\n"
+#define USER_NO_LOCATION "\n~ You don't have any location\n"
+#define ASK_SURE_DELETE_SERVER "\n~ This operation will delete all locations on server!\n~ Do you want to continue? (y/n): "
+#define ASK_SURE_DELETE_LOCAL "\n~ This operation will delete all local locations!\n~ Do you want to continue? (y/n): "
+#define VIEW_SERVER "Viewing Server locations:\n"
+#define VIEW_LOCAL "Viewing local locations:\n"
+#define UPDATING_LOCATION "Updating locations:\n"
+#define DELETING_LOCATION "Deleting location:\n"
+#define VIEW_FETCHED "Viewing new Sites from fellow Site sharer:\n"
+
+#define LOGIN_NOT "\n~ You are not logged in yet!\n" 
+#define ADD_LOCATION_SUCCESS "\n~ New location added! Welldone Site sharer <3\n" 
+#define NO_RESULT "\nNo results\n" 
+#define PREV_PAGE_HOW "Type '\\p' to prev page "
+#define NEXT_PAGE_HOW "Type '\\n' to next page"
+#define NO_PREV_PAGE "\n~ No previous page\n"
+#define NO_NEXT_PAGE "\n~ Reached the end of result\n"
+#define SERVER_LOCATION_DELETE_SUCCESS "\n~ Server locations deleted\n"
+#define SAVE_LOCATION_SUCCESS "\n~ Locations saved to server. We got your back ;)\n"
+#define RESTORE_LOCATION_SUCCESS "\n~ Restored locations successfully. Worry not, Site sharer!\n"
+#define ADD_LOCATION_INS "(Add location form. Note: Leave a blank input if you wish to quit)\n"
+
+#define FAREWELL "\nFarewell Site sharer\n\n"
+
 typedef int RequestLengthType;
 typedef int ResponseLengthType;
 
@@ -30,7 +59,8 @@ typedef enum {
 	GET_OWNED,		
 	GET_SHARED,
 	FETCH_UNSEEN,			//fetch new location when user log in
-	DELETE_LOCATIONS
+	DELETE_LOCATIONS,
+	GET_USERS
 } RequestOpcode;
 
 typedef enum {

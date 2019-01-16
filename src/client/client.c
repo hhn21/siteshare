@@ -21,9 +21,9 @@
 
 int main(int argc, char** argv) {
 	/********************************************* Process arguments *********************************************************/
-	if(argc != 3) error("\n~ You must run program with address and port number!");
+	if(argc != 3) error(ADDRESS_PORT_NEED);
 	int port = stoui(argv[2]);
-	if(port == -1) error("\n~ Invalid port number");
+	if(port == -1) error(PORT_INVALID);
 
 	/********************************************* Connect to server *********************************************************/
 	int socketfd;
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 	
 	//Step 3: Request to connect server
 	if(connect(socketfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) < 0){
-		printf("\nError!Can not connect to sever! Client exit imediately!\n\n");
+		printf(SERVER_CANNOT_CONNECT);
 		return 0;
 	}
 
@@ -53,7 +53,9 @@ int main(int argc, char** argv) {
     int buffSize;
     Location *location, *locations, tmpLocation;
     int currPage, rs, locationNum, printLabel;
-    Location locationArr[10];
+    Location locationArr[PAGE_SIZE];
+    int userNum;
+    Account *users;
 
     Request req;
     Response res;
@@ -69,10 +71,45 @@ int main(int argc, char** argv) {
             case IOPT_MAINMENU: 
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("\n~ You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME;
                     break;
                 }
+
+                printLabel = 1;
+                currPage = 1;
+                do {
+                    req.opcode = FETCH_UNSEEN;
+                    req.length = sizeof(int);
+                    req.data = &currPage;
+                    request(socketfd, req, &res);
+                    
+                    if (res.status == SUCCESS) {
+                        locationNum = res.length / sizeof(Location);
+                        if(locationNum == 0) break;
+                        if(printLabel) {
+                            printLabel = 0;
+                            printf(SCREEN_SPLITTER);
+                            printf(VIEW_FETCHED);
+                            printLocationLabel();
+                        }
+                        locations = res.data;
+                        for(int i = 0; i < locationNum; i++) {
+                            location = malloc(sizeof(Location));
+                            memcpy(location, &locations[i], sizeof(Location));
+                            addLocationtoBook(locationBook, location);
+                            addNewLocationOfUser(location, username);
+                            printLocationInfo(locations[i], i);
+                        }
+                        free(res.data);
+                    } else {
+                        printf("\n%s\n", (char*)res.data);
+                        opt = IOPT_MAINMENU;
+                        free(res.data);
+                        break;
+                    }
+                } while(1);
+
                 opt = mainMenu(username);
                 break;
 
@@ -97,6 +134,7 @@ int main(int argc, char** argv) {
 					if(importLocationOfUser(locationBook, username) < 0) {
                         createUserDBFile(username);
                     }
+                    opt = IOPT_MAINMENU;
             	} else {
             		opt = IOPT_LOGIN;
             	}
@@ -131,11 +169,11 @@ int main(int argc, char** argv) {
                 free(res.data);
             	break;
 
-/******************************** 5. Log out ********************************/
+/******************************** 7. Log out ********************************/
             case IOPT_LOGOUT:
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("\n~ You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME;
                     break;
                 }
@@ -167,7 +205,7 @@ int main(int argc, char** argv) {
             case IOPT_ADD_LOCAL: 
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("\n~ You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -192,7 +230,7 @@ int main(int argc, char** argv) {
 
                 // save location to db
                 addNewLocationOfUser(location, username);
-                printf("\n~ New location added! Welldone Site sharer\n");
+                printf(ADD_LOCATION_SUCCESS);
                 opt = IOPT_MAINMENU;
             	break;
 
@@ -200,7 +238,7 @@ int main(int argc, char** argv) {
             case IOPT_SHOW_LOCAL:
                 //authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("\n~ You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -208,24 +246,24 @@ int main(int argc, char** argv) {
                 location = NULL;
                 opt = showLocalLocation(locationBook, username, &location);
                 if(location != NULL) {
-                    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-                    printf("Location:\n");
+                    printf(SCREEN_SPLITTER);
+                    printf(UPDATING_LOCATION);
                     printLocationLabel();
                     printLocationInfo(*location, 1);
                     opt = locationUpdateMenu();
                 }
                 break;
 
-/******************************** 2. Update local location ********************************/
+/******************************** 2.1 Update local location ********************************/
             case IOPT_UPDATE_LOCAL:
                 //authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("\n~ You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME; 
                     break;
                 }
-                printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-                printf("Location:\n");
+                printf(SCREEN_SPLITTER);
+                printf(UPDATING_LOCATION);
                 printLocationLabel();
                 printLocationInfo(*location, 1);
                 inputUpdateLocationInfo(*location, &tmpLocation);
@@ -233,14 +271,14 @@ int main(int argc, char** argv) {
                 strcpy(location->name, tmpLocation.name);
                 strcpy(location->note, tmpLocation.note);
                 saveLocationOfUser(locationBook, username);
-                printf("Updated location\n");
+                printf("\n~ Location updated\n");
                 opt = IOPT_MAINMENU;
                 break;
 
-/******************************** 2. Update local location ********************************/
+/******************************** 2. Delete local location ********************************/
             case IOPT_DELETE_LOCAL:
-                printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-                printf("Location:\n");
+                printf(SCREEN_SPLITTER);
+                printf(DELETING_LOCATION);
                 printLocationLabel();
                 printLocationInfo(*location, 1);
                 deleteALocationOfUser(locationBook, username, location);
@@ -260,28 +298,30 @@ int main(int argc, char** argv) {
                     if (res.status == SUCCESS) {
                         locationNum = res.length / sizeof(Location);
                         if(locationNum > 0) {
+                            printf(SCREEN_SPLITTER);
+                            printf(VIEW_SERVER);
                             printLocationLabel();
                             locations = res.data;
                             for(int i = 0; i < locationNum; i++) {
                                 printLocationInfo(locations[i], i + 1);
                             }
                         } else {
-                            printf("\n\nNo results\n");
+                            printf(NO_RESULT);
                         }
                         printf("Page %d ", currPage);
-                        if(currPage > 1) printf("Type '\\p' to prev page ");
-                        if(locationNum == PAGE_SIZE) printf("Type '\\n' to next page");
+                        if(currPage > 1) printf(PREV_PAGE_HOW);
+                        if(locationNum == PAGE_SIZE) printf(NEXT_PAGE_HOW);
                         rs = pageNavigateNoNumber();
                         if(rs == -2) { 
                             if(currPage == 1) {
-                                printf("Error! No previous page!\n");
+                                printf(NO_PREV_PAGE);
                                 continue;
                             }
                             currPage -= 1; continue; 
                         }
                         if(rs == -1) { 
                             if(locationNum != PAGE_SIZE) {
-                                printf("Error! No next page!\n");
+                                printf(NO_NEXT_PAGE);
                                 continue;
                             }
                             currPage += 1; continue; 
@@ -302,7 +342,7 @@ int main(int argc, char** argv) {
             case IOPT_SHARE:
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -312,10 +352,58 @@ int main(int argc, char** argv) {
                 if(opt == IOPT_MAINMENU) break;
 
                 // input receiver
-                opt = inputSharingReceiver(receiver);
+                currPage = 1;
+                do {
+                    req.opcode = GET_USERS;
+                    req.length = sizeof(currPage);
+                    req.data = &currPage;
+                    request(socketfd, req, &res);
+                    if (res.status == SUCCESS) {
+                        userNum = res.length / sizeof(Account);
+                        if(userNum > 0) {
+                            printf(SCREEN_SPLITTER);
+                            printf("Choose receiver\n");
+                            users = res.data;
+                            for(int i = 0; i < userNum; i++) {
+                                printf("%-10d %-30s\n", i + 1, users[i].username);  
+                            }
+                        } else {
+                            printf(NO_RESULT);
+                        }
+                        printf("\nPage %d ", currPage);
+                        if(currPage > 1) printf(PREV_PAGE_HOW);
+                        if(userNum == ACC_PAGE_SIZE) printf(NEXT_PAGE_HOW);
+                    }
+                    rs = pageNavigate(1, userNum);
+                    if(rs > 0) {
+                        strcpy(receiver, users[rs - 1].username);
+                        break;
+                    }
+                    free(res.data);
+                    if(rs == -2) { 
+                        if(currPage == 1) {
+                            printf(NO_PREV_PAGE);
+                            continue;
+                        }
+                        currPage -= 1; continue; 
+                    }
+                    if(rs == -1) { 
+                        if(locationNum != PAGE_SIZE) {
+                            printf(NO_NEXT_PAGE);
+                            continue;
+                        }
+                        currPage += 1; continue; 
+                    }
+                    if(rs == 0) {
+                        free(res.data);
+                        opt = IOPT_MAINMENU;
+                        break;
+                    }
+                } while(opt != IOPT_MAINMENU);
                 if(opt == IOPT_MAINMENU) break;
 
                 // send location to server
+                printf("Sharing location to %s\n", receiver);
                 buffSize = makeShareDataBuff(receiver, location, &buff); // Buff: Location|receiver
                 req.opcode = SHARE_LOCATION;
                 req.length = buffSize;
@@ -324,11 +412,6 @@ int main(int argc, char** argv) {
 
                 // receive response from server
                 printf("\n%s\n", (char*)res.data);
-                if (res.status == SUCCESS) {
-                    // printf("Share succeeded!\n");
-                } else {
-                    printf("\nTODO: why fail, share user does not exist?\n");
-                }
                 opt = IOPT_MAINMENU;
 
                 //free malloc for further use
@@ -341,7 +424,7 @@ int main(int argc, char** argv) {
             case IOPT_SAVE: 
             	//authentication
                 if(sessionStatus != LOGGED_IN) {
-                    printf("You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -359,6 +442,7 @@ int main(int argc, char** argv) {
                         break;
                     }
                     free(res.data);
+                    printf(SERVER_LOCATION_DELETE_SUCCESS);
                     // send locations to server
                     currPage = 1;
                     do {
@@ -371,12 +455,13 @@ int main(int argc, char** argv) {
 
                         //receive response from server
                         if (res.status != SUCCESS) {
+                            printf("\n%s\n", (char*)res.data);
                             opt = IOPT_MAINMENU;
                             break;
                         }
                         free(res.data);
                     } while(rs > 0);
-                    printf("\n%s\n", (char*)res.data);
+                    printf(SAVE_LOCATION_SUCCESS);
                     opt = IOPT_MAINMENU;
                 }
             	break;
@@ -385,7 +470,7 @@ int main(int argc, char** argv) {
             case IOPT_RESTORE: 
             	//authentication
             	 if(sessionStatus != LOGGED_IN) {
-                    printf("You are not logged in yet!\n");
+                    printf(LOGIN_NOT);
                     opt = IOPT_WELCOME; 
                     break;
                 }
@@ -395,7 +480,7 @@ int main(int argc, char** argv) {
                     // delete local locations
                     deleteLocationOfUser(locationBook, username);
                     createUserDBFile(username);
-                    printf("Deleted local locations\n");
+                    printf("\n~ Deleted local locations\n");
                     // restore locations from server
                     currPage = 1;
                     do {
@@ -421,61 +506,22 @@ int main(int argc, char** argv) {
                         }
                         currPage++;
                     } while(1);
-                    printf("Restored locations successfully\n");
+                    printf(RESTORE_LOCATION_SUCCESS);
                 }
                 opt = IOPT_MAINMENU;
             	break;
 
-/******************************** Fetch new location from server ****************/
-            case IOPT_FETCH: 
-            	//authentication
-                if(sessionStatus != LOGGED_IN) {
-                    printf("\n~ You are not logged in yet!\n");
-                    opt = IOPT_WELCOME;
-                    break;
-                }
-                printf("\n~ fetching unseen locations ...\n");
-                printLabel = 1;
-                currPage = 1;
-                do {
-                    req.opcode = FETCH_UNSEEN;
-                    req.length = sizeof(int);
-                    req.data = &currPage;
-                    request(socketfd, req, &res);
-                    if (res.status == SUCCESS) {
-                        locationNum = res.length / sizeof(Location);
-                        if(locationNum == 0) break;
-                        if(printLabel) {
-                            printLabel = 0;
-                            printLocationLabel();
-                        }
-                        locations = res.data;
-                        for(int i = 0; i < locationNum; i++) {
-                            location = malloc(sizeof(Location));
-                            memcpy(location, &locations[i], sizeof(Location));
-                            addLocationtoBook(locationBook, location);
-                            addNewLocationOfUser(location, username);
-                            printLocationInfo(locations[i], i);
-                        }
-                        free(res.data);
-                    } else {
-                        opt = IOPT_MAINMENU;
-                        free(res.data);
-                        break;
-                    }
-                } while(1);
-                printf("\n~ fetched unseen locations ...\n");
-                opt = IOPT_MAINMENU;
-                free(buff);
-                buff = NULL;
+/******************************** 8. Refresh mainmenu ****************/
+            case IOPT_FETCH:
+                opt = IOPT_MAINMENU; 
                 break;
 
-/******************************** 3. 6. Exit ********************************/
+/******************************** 9. Exit ********************************/
             case IOPT_EXIT:
                 break;
         }
         if (opt == IOPT_EXIT) {
-            printf("\nFarewell Site sharer\n\n");
+            printf(FAREWELL);
         }
     } while(opt != IOPT_EXIT);
 

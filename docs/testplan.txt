@@ -14,8 +14,14 @@ II. Main menu screen:
 		a. Không ấn gì, enter =>back
 		b. Shop, không gì => back
 		c. Shop, Sivi Mart, không gì => back
-		d. Shop, Sivi Mart, chỗ này rẻ, => success
-	2. share location
-	3. 
+		d. Shop, Sivi Mart, This place is so cheap => success
+	2. Show local:
+		a. Không ấn gì, enter =>back
+		b. Chọn 1-10, => update menu
+
+	3. Show server:
+		a.
+	4. Share location:
+		a.
 
 

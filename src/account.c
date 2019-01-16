@@ -1,6 +1,41 @@
 #include "account.h"
 
 /*
+ * Validate username must has only alphabet characters and digits
+ * params:
+ *		username
+ * Returns:
+ *		1 if username is valid
+ *		0 if username is invalid
+ */
+int validateUsername(char* username){
+	for(int i = 0; i < strlen(username); i++){
+		if(!(
+			(username[i] >= 'a' && username[i] <= 'z') || 
+			(username[i] >= 'A' && username[i] <= 'Z') ||
+			(username[i] >= '0' && username[i] <= '9')
+		)) return 0;
+	}
+	return 1;
+}
+
+
+/*
+ * Validate password cannot have space character
+ * params:
+ *		password
+ * Returns:
+ *		1 if password is valid
+ *		0 if password is invalid
+ */
+int validatePassword(char* password){
+	for(int i = 0; i < strlen(password); i++){
+		if(password[i] == ' ' || password[i] == '\n' || password[i] == '\t') return 0;
+	}
+	return 1;
+}
+
+/*
  * Display info of an account: name, password, ACTIVE or BLOCKED
  * params:
  *		a Account to display info
@@ -87,4 +122,34 @@ Account* findAccountByName(List* list, char* username) {
     }
 
     return NULL;
+}
+
+/*
+ * get users indexed by giving page
+ * Params:
+ *   accountList account list to get
+ *   page int page number
+ *   result array to save the result
+ * Return:
+ *   Number of users have been gotten
+ */
+int getUserByPage(List* accountList, int page, Account *result){
+	ListNode *node = accountList->root;
+	Account *a;
+	int i;
+
+	// go to desired page
+	for(i = 0; i < (page-1) * ACC_PAGE_SIZE; i++){
+		if(node == NULL) return 0;
+		node = node->next;
+	}
+
+	for(i = 0; i < ACC_PAGE_SIZE; i++) {
+		if(node == NULL) break;
+		a = (Account*)node->data;
+		strcpy(result[i].username, a->username);
+		node = node->next;
+	}
+
+	return i;
 }

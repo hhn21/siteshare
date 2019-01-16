@@ -92,20 +92,33 @@ Option loginMenu(){
  */
 Option inputLoginCredentials(char* username, char* password){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("(login screen)\n");
-    printf("User name: ");
-    fgets(username, ACC_NAME_MAX_LEN-1, stdin);
-    username[strlen(username) - 1] = '\0';
-    if (username[0] == '\0') {
-        printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+    printf("(Login screen)\n");
+    while(1) {
+        printf("User name: ");
+        fgets(username, ACC_NAME_MAX_LEN-1, stdin);
+        username[strlen(username) - 1] = '\0';
+        if (username[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validateUsername(username)) break;
+        else {
+            printf("Username must has only alphabet characters and digits\n");
+        }
     }
-    printf("Password : ");
-    fgets(password, ACC_NAME_MAX_LEN-1, stdin);
-    password[strlen(password) - 1] = '\0';
-    if (password[0] == '\0') {
-        printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+
+    while(1) {
+        printf("Password : ");
+        fgets(password, ACC_NAME_MAX_LEN-1, stdin);
+        password[strlen(password) - 1] = '\0';
+        if (password[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validatePassword(password)) break;
+        else {
+            printf("Password cannot have space character\n");
+        }
     }
     return IOPT_LOGIN;
 }
@@ -121,20 +134,33 @@ Option inputLoginCredentials(char* username, char* password){
  */
 Option inputSignupCredentials(char username[], char password[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("(sign up screen)\n");
-    printf("User name: ");
-    fgets(username, ACC_NAME_MAX_LEN - 1, stdin);
-    username[strlen(username) - 1] = '\0';
-    if (username[0] == '\0') {
-        printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+    printf("(Sign up screen)\n");
+    while(1) {
+        printf("User name: ");
+        fgets(username, ACC_NAME_MAX_LEN-1, stdin);
+        username[strlen(username) - 1] = '\0';
+        if (username[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validateUsername(username)) break;
+        else {
+            printf("Username must has only alphabet characters and digits\n");
+        }
     }
-    printf("Password : ");
-    fgets(password, ACC_NAME_MAX_LEN - 1, stdin);
-    password[strlen(password) - 1] = '\0';
-    if (password[0] == '\0') {
-        printf("You input nothing, which means back\n");
-        return IOPT_WELCOME;
+
+    while(1) {
+        printf("Password : ");
+        fgets(password, ACC_NAME_MAX_LEN-1, stdin);
+        password[strlen(password) - 1] = '\0';
+        if (password[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validatePassword(password)) break;
+        else {
+            printf("Password cannot have space character\n");
+        }
     }
     return IOPT_SIGNUP;
 }
