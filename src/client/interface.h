@@ -14,8 +14,10 @@
 typedef enum {
     IOPT_WELCOME, //welcome screen, see printWelcomeScreen()
     IOPT_MAINMENU, // home screen, see print Main menu
-    IOPT_ADD,
+    IOPT_ADD_LOCAL,
     IOPT_SHOW_LOCAL,
+    IOPT_UPDATE_LOCAL,
+    IOPT_DELETE_LOCAL,
     IOPT_SHOW_SERVER,
     IOPT_SHARE,
     IOPT_SAVE,
@@ -92,7 +94,7 @@ void printMainMenu(char username[]);
  *  Params:
  *      username
  *  Return: Option
- *      IOPT_ADD;
+ *      IOPT_ADD_LOCAL;
  *      IOPT_SHOW_LOCAL;
  *      IOPT_SHOW_SERVER;
  *      IOPT_SHARE;
@@ -109,13 +111,13 @@ Option mainMenu(char username[]);
  */
 void printCategoryList();
 
-/* case: IOPT_ADD
+/* case: IOPT_ADD_LOCAL
  * input location info
  *  Params:
  *      Location* location
  *
  *  Return: Option
- *      IOPT_ADD (if succeed, continue)
+ *      IOPT_ADD_LOCAL (if succeed, continue)
  *      IOPT_MAINMENU (if user input nothing)
  */
 Option inputLocationInfo(Location *location);
@@ -212,5 +214,18 @@ int pageNavigate(int min, int max);
  *      > 0 value if inputed a number within [min,max] 
  */
 Option showLocalLocation(LocationBook *locationBook, char *username, Location **location);
+
+
+Option locationUpdateMenu();
+
+/* case: IOPT_UPDATE_LOCAL
+ * input location info
+ *  Params:
+ *      Location* location
+ *
+ *  Return: Option
+ *      IOPT_UPDATE_LOCAL
+ */
+Option inputUpdateLocationInfo(Location old, Location *new);
 
 #endif

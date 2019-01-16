@@ -21,6 +21,13 @@
 #define ADDRESS_PORT_NEED "\n~ You must run program with address and port number!"
 #define PORT_INVALID "\n~ Invalid port number" 
 #define SERVER_CANNOT_CONNECT "\nError! Can not connect to sever! Client exit imediately!\n" 
+#define SCREEN_SPLITTER "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+#define MENU_SPLITTER "----------\n"
+#define INPUT_NOTHING_TO_BACK "\n~ You input nothing, which means back\n"
+#define USER_NO_LOCATION "\n~ You don't have any location\n"
+#define ASK_SURE_DELETE_SERVER "\n~ This operation will delete all locations on server!\n~ Do you want to continue? (y/n): "
+#define ASK_SURE_DELETE_LOCAL "\n~ This operation will delete all local locations!\n~ Do you want to continue? (y/n): "
+
 
 #define LOGIN_NOT "\n~ You are not logged in yet!\n" 
 #define ADD_LOCATION_SUCCESS "\n~ New location added! Welldone Site sharer <3\n" 
@@ -28,7 +35,7 @@
 #define PREV_PAGE_HOW "Type '\\p' to prev page "
 #define NEXT_PAGE_HOW "Type '\\n' to next page"
 #define NO_PREV_PAGE "\n~ No previous page\n"
-#define NO_NEXT_PAGE "\n~ No next page!\n"
+#define NO_NEXT_PAGE "\n~ Reached the end of result\n"
 #define SERVER_LOCATION_DELETE_SUCCESS "\n~ Server locations deleted\n"
 #define SAVE_LOCATION_SUCCESS "\n~ Locations saved to server. We got your back ;)\n"
 #define RESTORE_LOCATION_SUCCESS "\n~ Restored locations successfully. Worry not, Site sharer!\n"
