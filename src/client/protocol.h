@@ -59,7 +59,8 @@ typedef enum {
 	GET_OWNED,		
 	GET_SHARED,
 	FETCH_UNSEEN,			//fetch new location when user log in
-	DELETE_LOCATIONS
+	DELETE_LOCATIONS,
+	GET_USERS
 } RequestOpcode;
 
 typedef enum {

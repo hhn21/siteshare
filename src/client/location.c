@@ -249,6 +249,8 @@ void createUserDBFile(char* username){
  */
 int getLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result){
 	List *locations = getLocationsByOwner(book, username);
+	if(locations == NULL) return 0;
+	
 	ListNode *node = locations->root;
 	Location *l;
 	int i;

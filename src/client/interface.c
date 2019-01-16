@@ -73,21 +73,34 @@ Option welcomeMenu(){
  *      IOPT_MAINMENU (if succeed)
  */
 Option inputLoginCredentials(char* username, char* password){
-    printf(SCREEN_SPLITTER);
-    printf("(login screen)\n");
-    printf("User name: ");
-    fgets(username, ACC_NAME_MAX_LEN, stdin);
-    username[strlen(username) - 1] = '\0';
-    if (username[0] == '\0') {
-        printf(INPUT_NOTHING_TO_BACK);
-        return IOPT_WELCOME;
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("(Login screen)\n");
+    while(1) {
+        printf("User name: ");
+        fgets(username, ACC_NAME_MAX_LEN-1, stdin);
+        username[strlen(username) - 1] = '\0';
+        if (username[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validateUsername(username)) break;
+        else {
+            printf("Username must has only alphabet characters and digits\n");
+        }
     }
-    printf("Password : ");
-    fgets(password, ACC_NAME_MAX_LEN, stdin);
-    password[strlen(password) - 1] = '\0';
-    if (password[0] == '\0') {
-        printf(INPUT_NOTHING_TO_BACK);
-        return IOPT_WELCOME;
+
+    while(1) {
+        printf("Password : ");
+        fgets(password, ACC_NAME_MAX_LEN-1, stdin);
+        password[strlen(password) - 1] = '\0';
+        if (password[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validatePassword(password)) break;
+        else {
+            printf("Password cannot have space character\n");
+        }
     }
     return IOPT_LOGIN;
 }
@@ -120,24 +133,38 @@ int makeAuthDataBuff(char* username, char* password, char** buff) {
  *      IOPT_MAINMENU (if succeed)
  */
 Option inputSignupCredentials(char username[], char password[]){
-    printf(SCREEN_SPLITTER);
-    printf("(sign up screen)\n");
-    printf("User name: ");
-    fgets(username, ACC_NAME_MAX_LEN, stdin);
-    username[strlen(username) - 1] = '\0';
-    if (username[0] == '\0') {
-        printf(INPUT_NOTHING_TO_BACK);
-        return IOPT_WELCOME;
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("(Sign up screen)\n");
+    while(1) {
+        printf("User name: ");
+        fgets(username, ACC_NAME_MAX_LEN-1, stdin);
+        username[strlen(username) - 1] = '\0';
+        if (username[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validateUsername(username)) break;
+        else {
+            printf("Username must has only alphabet characters and digits\n");
+        }
     }
-    printf("Password : ");
-    fgets(password, ACC_NAME_MAX_LEN, stdin);
-    password[strlen(password) - 1] = '\0';
-    if (password[0] == '\0') {
-        printf(INPUT_NOTHING_TO_BACK);
-        return IOPT_WELCOME;
+
+    while(1) {
+        printf("Password : ");
+        fgets(password, ACC_NAME_MAX_LEN-1, stdin);
+        password[strlen(password) - 1] = '\0';
+        if (password[0] == '\0') {
+            printf("You input nothing, which means back\n");
+            return IOPT_WELCOME;
+        }
+        if (validatePassword(password)) break;
+        else {
+            printf("Password cannot have space character\n");
+        }
     }
     return IOPT_SIGNUP;
 }
+
 
 
 
@@ -156,10 +183,11 @@ void printMainMenu(char username[]){
     printf("4. Share location\n");
     printf("5. Save to server\n");
     printf("6. Restore from server\n");
-    printf("7. Log out\n");
-    printf("8. Exit\n");
+    printf("7. Refresh\n");
+    printf("8. Log out\n");
+    printf("9. Exit\n");
     printf("----------\n");
-    printf("Please choose from 1 to 8\n");
+    printf("Please choose from 1 to 9\n");
     printf("Your choice: ");
 }
 
@@ -184,11 +212,11 @@ Option mainMenu(char username[]){
         fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
         opt = atoi(buf);
-        if (opt < 1 || opt > 8)
+        if (opt < 1 || opt > 9)
         {
             printf("\n~ Invalid input. Please input a number, from 1 to 8\n");
         }
-    } while (opt < 1 || opt > 8);
+    } while (opt < 1 || opt > 9);
 
     switch(opt) {
         case 1: return IOPT_ADD_LOCAL;
@@ -197,8 +225,9 @@ Option mainMenu(char username[]){
         case 4: return IOPT_SHARE;
         case 5: return IOPT_SAVE;
         case 6: return IOPT_RESTORE;
-        case 7: return IOPT_LOGOUT;
-        case 8: return IOPT_EXIT;
+        case 7: return IOPT_FETCH;
+        case 8: return IOPT_LOGOUT;
+        case 9: return IOPT_EXIT;
     }
     return IOPT_EXIT;
 }
@@ -348,7 +377,7 @@ int pageNavigateNoNumber() {
     char buf[OPT_MAX_LEN];
 
     while(1) {
-        printf("\n\nYour choise (Enter to quit): ");
+        printf("\n\nInput command (Enter to quit): ");
         fgets(buf, OPT_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
 
@@ -374,7 +403,7 @@ int pageNavigate(int min, int max) {
     char buf[OPT_MAX_LEN];
 
     while(1) {
-        printf("\nChoose location (%d-%d), enter to quit: ", min, max);
+        printf("\nChoose item (%d-%d), enter to quit: ", min, max);
         fgets(buf, OPT_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
 
@@ -414,7 +443,7 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
     int printPageInfo;
 
     locations = getLocationsByOwner(book, username);
-    if(locations == NULL) {
+    if(locations == NULL || locations->root == NULL) {
         printf(USER_NO_LOCATION);
         return IOPT_MAINMENU;
     }
@@ -477,8 +506,10 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
                 }
 
                 // else
-                *location = l_a[pageCmd - 1];
-                return IOPT_SHARE;
+                if(pageCmd > 0) {
+                    *location = l_a[pageCmd - 1];
+                    return IOPT_SHARE;
+                }
             } while (1);
         }
     }

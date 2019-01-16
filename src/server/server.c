@@ -40,15 +40,19 @@ int authenticate(Session *session, char* credentials) {
 	Account *a;
 
 	sscanf(credentials, "%s\n%s", username, password);
+	pthread_mutex_lock(&accountListMutex);
 	a = findAccountByName(accountList, username);
 	if(a != NULL) {
 		if(strcmp(a->password, password) == 0) {
 			session->status = LOGGED_IN;
 			session->user = *a;
+			pthread_mutex_unlock(&accountListMutex);
 			return 1;
 		}
+		pthread_mutex_unlock(&accountListMutex);
 		return -1;
 	}
+	pthread_mutex_unlock(&accountListMutex);
 	return 0;
 }
 
@@ -56,6 +60,7 @@ int authenticate(Session *session, char* credentials) {
  * params:
  *		credentials: "username\npassword" form string
  * return:
+ *		-1 if username or password is invalid
  *		0 if signup fail
  *		1 if signup success
  */
@@ -66,6 +71,8 @@ int signup(char* credentials) {
 	int rs = 0;
 
 	sscanf(credentials, "%s\n%s", username, password);
+	if(!validateUsername(username) || !validatePassword(password)) 
+		return -1;
 	pthread_mutex_lock(&accountListMutex);
 	a = findAccountByName(accountList, username);
 	if(a == NULL) {
@@ -74,6 +81,7 @@ int signup(char* credentials) {
 		strcpy(a->password, password);
 		a->isActive = 1;
 		insertAtTail(accountList, a);
+		createUserDBFile(username);
 		saveAccountToFile(accountList, "./data/account.txt");
 		rs = 1;
 	}
@@ -185,6 +193,7 @@ void* handler(void *arg){
 	int rs;			//result, determind what to send back to user
 
 	Location locationArr[PAGE_SIZE];
+	Account userArr[ACC_PAGE_SIZE];
 
 	while(1) {
 		if(fetchRequest(connSock, &req) < 0) break;
@@ -209,14 +218,18 @@ void* handler(void *arg){
 				break;
 			case SIGNUP:
 				rs = signup(req.data);
-				if(rs) { 
+				if(rs == 1) { 
 					res.status = SUCCESS;
 					res.length = strlen(SIGNUP_SUCCESS)+1;
 					res.data = SIGNUP_SUCCESS; 
-				} else  { 
+				} else if(rs == 0) { 
 					res.status = ERROR;
 					res.length = strlen(SIGNUP_FAIL_USERNAME_EXIST)+1;
 					res.data = SIGNUP_FAIL_USERNAME_EXIST; 
+				} else if(rs == -1) { 
+					res.status = ERROR;
+					res.length = strlen(SIGNUP_FAIL_CREDENTIAL_INVALID)+1;
+					res.data = SIGNUP_FAIL_CREDENTIAL_INVALID; 
 				}
 				break;
 			case LOGOUT:
@@ -314,6 +327,23 @@ void* handler(void *arg){
 					res.data = RESTORE_FAIL; 
 				}
 				break;
+			case GET_USERS:
+				if(session->status != LOGGED_IN) 
+					rs = -1;
+				else {
+					pthread_mutex_lock(&accountListMutex);
+					rs = getUserByPageExcept(accountList, *(int*)req.data, userArr, session->user.username);
+					pthread_mutex_unlock(&accountListMutex);
+				}
+				if(rs >= 0){
+					res.status = SUCCESS;
+					res.length = rs * sizeof(Account);
+					res.data = userArr;
+				} else {
+					res.status = ERROR;
+					res.length = 0;
+					res.data = ""; 
+				}
 			default:
 				break;
 		}

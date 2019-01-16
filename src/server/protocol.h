@@ -25,14 +25,15 @@
 
 #define SIGNUP_SUCCESS 					"~ Signup succeeded! Now you can login to system"
 #define SIGNUP_FAIL_USERNAME_EXIST 		"~ Signup failed! Username already exists"
+#define SIGNUP_FAIL_CREDENTIAL_INVALID	"~ Signup failed! Username or password is invalid"
 
 #define LOGOUT_SUCCESS 					"~ Logout succeeded"
 #define LOGOUT_FAIL 					"~ Logout failed"
 
-#define SHARE_SUCCESS "~ Share succeeded! The world owes you a new discovery"
-#define SHARE_FAIL_AUTH_USER "~ Share failed. You do not have authority towards the Site"
-#define SHARE_FAIL_USERNAME_NOT_EXIST "~ Share failed. User does not exists"
-#define SHARE_FAIL_CANNOT_SHARE_SELF "~ Share failed. Cannot share to yourself"
+#define SHARE_SUCCESS 					"~ Share succeeded! The world owes you a new discovery"
+#define SHARE_FAIL_AUTH_USER 			"~ Share failed. You do not have authority towards the Site"
+#define SHARE_FAIL_USERNAME_NOT_EXIST 	"~ Share failed. User does not exists"
+#define SHARE_FAIL_CANNOT_SHARE_SELF 	"~ Share failed. Cannot share to yourself"
 
 #define SAVE_SUCCESS 					"~ Saved locations on server"
 #define SAVE_FAIL 						"~ Some error occured! Save failed"
@@ -56,7 +57,8 @@ typedef enum {
 	GET_OWNED,
 	GET_SHARED,
 	FETCH_UNSEEN,			//fetch new location when user log in
-	DELETE_LOCATIONS
+	DELETE_LOCATIONS,
+	GET_USERS
 } RequestOpcode;
 
 typedef enum {

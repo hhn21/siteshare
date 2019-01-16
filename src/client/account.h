@@ -9,13 +9,35 @@
 
 #define ACC_NAME_MAX_LEN 45
 
+#define ACC_PAGE_SIZE 10
+
 typedef struct {
     char username[ACC_NAME_MAX_LEN];
     char password[ACC_NAME_MAX_LEN];
     int isActive;
-    int isLoggedIn;
     int triedTime;
 } Account;
+
+/*
+ * Validate username must has only alphabet characters and digits
+ * params:
+ *		username
+ * Returns:
+ *		1 if username is valid
+ *		0 if username is invalid
+ */
+int validateUsername(char* username);
+
+
+/*
+ * Validate password cannot have space character
+ * params:
+ *		password
+ * Returns:
+ *		1 if password is valid
+ *		0 if password is invalid
+ */
+int validatePassword(char* password);
 
 /*
  * Display 3 info of an account: name, password, ACTIVE or BLOCKED
@@ -23,17 +45,6 @@ typedef struct {
  *		a Account to display info
  */
 void displayAccount(Account a);
-
-/* 
- * Find account by username
- *	Params:
- *		List* list account list
- *		char *username
- *	Return:
- * -  Account which has given username
- * -  NULL if not found
- */
-Account* findAccountByName(List* list, char* username);
 
 /*
  * import account data from file to a linked list
@@ -54,6 +65,21 @@ int importAccountFromFile(List* list, char *filename);
  */
 void saveAccountToFile(List* accounts, char *filename);
 
+// Find account by username
+// Return:
+// -  Account which has given username
+// -  NULL if not found
+Account* findAccountByName(List* list, char* username);
 
+/*
+ * get users indexed by giving page
+ * Params:
+ *   accountList account list to get
+ *   page int page number
+ *   result array to save the result
+ * Return:
+ *   Number of users have been gotten
+ */
+int getUserByPage(List* accountList, int page, Account *result);
 
 #endif
