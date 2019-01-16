@@ -1,11 +1,20 @@
 #include "sllist.h"
 
+/*
+ * creat a new List
+ *	return: List*
+ */
 List* newList(){
     List *list = malloc(sizeof(List));
     list->root = NULL;
     return list;
 }
 
+/*
+ * create new node
+ *	params: data
+ *	return: ListNode*
+ */
 ListNode* makeNewNode(void* data){
     ListNode* new = (ListNode*) malloc(sizeof(ListNode));
     new->data = data;
@@ -13,12 +22,24 @@ ListNode* makeNewNode(void* data){
     return new;
 }
 
+/*
+ * insert new node at the head of List
+ *	params:
+ *		List* list
+ *		void* e node's data
+ */
 void insertAtHead(List *list, void* e){
     ListNode* new = makeNewNode(e);
     new->next = list->root;
     list->root = new;
 }
 
+/*
+ * insert new node at the tail of List
+ *	params:
+ *		List* list
+ *		void* e node's data
+ */
 void insertAtTail(List *list, void* e){
     ListNode* new = makeNewNode(e);
     if(list->root == NULL) {
@@ -32,6 +53,13 @@ void insertAtTail(List *list, void* e){
     }
 }
 
+/*
+ * insert new node at the position of List
+ *	params:
+ *		List* list
+ *		void* e node's data
+ *		int p the position
+ */
 void insertAtPosition(List *list, void* e, int p){
     if(p < 0) {
         printf("Vi tri khong hop le!\n");
@@ -61,6 +89,11 @@ void insertAtPosition(List *list, void* e, int p){
     }
 }
 
+/*
+ * delete head of node
+ *	params:
+ *		List* list
+ */
 void deleteHead(List *list){
     if(list->root != NULL) {
         ListNode *tmp = list->root->next;
@@ -69,6 +102,12 @@ void deleteHead(List *list){
     }
 }
 
+/*
+ * delete the node
+ *	params:
+ *		List* list
+ *		ListNode *node the node wish to delete
+ */
 void deleteNode(List *list, ListNode *node){
     ListNode *tmp = list->root;
     ListNode *prev = NULL;
@@ -84,6 +123,12 @@ void deleteNode(List *list, ListNode *node){
     }
 }
 
+/*
+ * delete the node at position
+ *	params:
+ *		List* list
+ *		int p the position
+ */
 void deleteAtPosition(List *list, int p){
     ListNode *tmp = list->root;
     ListNode *prev = NULL;
@@ -110,6 +155,11 @@ void deleteAtPosition(List *list, int p){
     }
 }
 
+/*
+ * delete the list
+ *	params:
+ *		List* list
+ */
 void destroyList(List *list){
     while(list->root != NULL) deleteHead(list);
     printf("Danh sach da duoc giai phong\n");

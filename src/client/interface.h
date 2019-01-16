@@ -12,7 +12,7 @@
 #define OPT_MAX_LEN 50
 
 typedef enum {
-    IOPT_WELCOME, //welcome screen, see printLoginMenu()
+    IOPT_WELCOME, //welcome screen, see printWelcomeScreen()
     IOPT_MAINMENU, // home screen, see print Main menu
     IOPT_ADD,
     IOPT_SHARE,
@@ -25,7 +25,7 @@ typedef enum {
     IOPT_EXIT
 } Option;
 
-/* used in loginMenu()
+/* used in welcomeMenu()
  * Print out the welcome screen
  * Params:
  *
@@ -44,7 +44,7 @@ void printWelcomeScreen();
  *  IOPT_EXIT
  *
  */
-Option loginMenu();
+Option welcomeMenu();
 
 /* case: IOPT_LOGIN
  * take username and password from user, check Auth()

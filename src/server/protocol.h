@@ -45,7 +45,7 @@ typedef enum {
 
 typedef struct {
 	int fd;    				// client socket descriptor
-	Account user;			// identify the user in the session
+	Account user;			// current user in the session
 	SessionStatus status;	// Session status
 } Session;
 

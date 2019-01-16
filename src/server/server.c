@@ -17,21 +17,23 @@
 #include "sllist.h"
 #include "protocol.h"
 
-List *accountList;
-LocationBook *locationBook;
-List *clientSessionList;
+List *accountList;			//list of account
+LocationBook *locationBook;	//TODO: ??
+List *clientSessionList;	//TODO: ??
 
-pthread_mutex_t accountListMutex;
-pthread_mutex_t clientSessionMutex;
-pthread_mutex_t locationBookMutex;
-pthread_mutex_t locationDBMutex;
+//TODO
+pthread_mutex_t accountListMutex;	//TODO
+pthread_mutex_t clientSessionMutex;	//TODO
+pthread_mutex_t locationBookMutex;	//TODO
+pthread_mutex_t locationDBMutex;	//TODO
 
 /* try to authenticate a client credentials
  * params:
  *		credentials: "username\npassword" form string
  * return:
- *		0 if authentication fail
- *		1 if authentication success
+ *	0 if account does not exist
+ *	1 if authentication success
+ *	2 if incorrect password
  */
 int authenticate(Session *session, char* credentials) {
 	char username[ACC_NAME_MAX_LEN];
@@ -46,6 +48,7 @@ int authenticate(Session *session, char* credentials) {
 			session->user = *a;
 			return 1;
 		}
+		return 2;
 	}
 	return 0;
 }
@@ -192,9 +195,9 @@ void* handler(void *arg){
 	pthread_mutex_unlock(&clientSessionMutex);
 
 	// communicate with client
-	Request req;
-	Response res;
-	int rs;			//result in boolean determind what to send back to user
+	Request req;	//request from user, includes: opcode, length, data
+	Response res;	//response message to client, includes: status, length, data
+	int rs;			//result, determind what to send back to user
 
 	Location locationArr[PAGE_SIZE];
 
@@ -203,10 +206,16 @@ void* handler(void *arg){
 		switch(req.opcode) {
 			case LOGIN:
 				rs = authenticate(session, req.data);
-				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
-				} else  { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+				switch(rs){
+					case 0:
+						res.status = ERROR; 	res.length = 28; 	res.data = "~ Username does not exist!";
+						break;
+					case 1:
+						res.status = SUCCESS; 	res.length = 0; 	res.data = "";
+						break;
+					case 2:
+						res.status = ERROR; 	res.length = 19; 	res.data = "~ Incorrect password!";
+						break;
 				}
 				break;
 			case SIGNUP:

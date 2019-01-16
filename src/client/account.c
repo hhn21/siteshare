@@ -2,7 +2,7 @@
 
 /*
  * Display info of an account: name, password, ACTIVE or BLOCKED
- * params:
+ *	params:
  *		a Account to display info
  */
 void displayAccount(Account a){
@@ -16,12 +16,33 @@ void displayAccount(Account a){
     printf("%-45s%-45s%-10s\n", a.username, a.password, activeLabel);
 };
 
+/* 
+ * Find account by username
+ *	Params:
+ *		List* list account list
+ *		char *username
+ *	Return:
+ * -  Account which has given username
+ * -  NULL if not found
+ */
+Account* findAccountByName(List* list, char* username) {
+	ListNode *tmp = list->root;
+	Account *a;
+    while(tmp != NULL) {
+        a = (Account*)tmp->data;
+        if(strcmp(a->username, username) == 0) return a;
+        tmp = tmp->next;
+    }
+
+    return NULL;
+}
+
 /*
  * import account data from file to a linked list
- * params:
+ *	params:
  *		list: single linked list contains accounts
  *		filename: file name string
- * return:
+ *	return:
  *		number of accounts were read
  *		-1 if has any error while reading file
  */
@@ -51,7 +72,7 @@ int importAccountFromFile(List* list, char *filename) {
 
 /*
  * save accounts from linked list to file (1 account per line, format: username password status)
- * params:
+ *	params:
  *		list: single linked list contains accounts
  *		filename: file name string
  */
@@ -72,19 +93,3 @@ void saveAccountToFile(List* accounts, char *filename) {
 	fclose(fpout);
 }
 
-/* Find account by username
- * Return:
- * -  Account which has given username
- * -  NULL if not found
- */
-Account* findAccountByName(List* list, char* username) {
-	ListNode *tmp = list->root;
-	Account *a;
-    while(tmp != NULL) {
-        a = (Account*)tmp->data;
-        if(strcmp(a->username, username) == 0) return a;
-        tmp = tmp->next;
-    }
-
-    return NULL;
-}

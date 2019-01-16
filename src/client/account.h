@@ -24,6 +24,17 @@ typedef struct {
  */
 void displayAccount(Account a);
 
+/* 
+ * Find account by username
+ *	Params:
+ *		List* list account list
+ *		char *username
+ *	Return:
+ * -  Account which has given username
+ * -  NULL if not found
+ */
+Account* findAccountByName(List* list, char* username);
+
 /*
  * import account data from file to a linked list
  * params:
@@ -43,10 +54,6 @@ int importAccountFromFile(List* list, char *filename);
  */
 void saveAccountToFile(List* accounts, char *filename);
 
-// Find account by username
-// Return:
-// -  Account which has given username
-// -  NULL if not found
-Account* findAccountByName(List* list, char* username);
+
 
 #endif

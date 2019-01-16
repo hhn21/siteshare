@@ -25,9 +25,9 @@ typedef enum {
 	SIGNUP,
 	LOGIN,
 	LOGOUT,
-	SHARE_LOCATION,
-	SAVE_LOCATION,
-	GET_OWNED,
+	SHARE_LOCATION,	//share to another user
+	SAVE_LOCATION,	//save location to server
+	GET_OWNED,		
 	GET_SHARED,
 	FETCH,			//fetch new location when user log in
 	DELETE_LOCATIONS
