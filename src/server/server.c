@@ -108,7 +108,11 @@ int shareLocation(Session *session, Request req){
 
 	if(strcmp(location->owner, session->user.username) != 0) {// validate sender
 		free(location);
-		return 0;
+		return -1;
+	}
+	if(findAccountByName(accountList, receiver) == NULL) { // validate receiver
+		free(location);
+		return -2;
 	}
 	strcpy(location->sharedBy, location->owner);
 	strcpy(location->owner, receiver);
@@ -244,6 +248,7 @@ void* handler(void *arg){
 				} else  { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			case SAVE_LOCATION:
 				rs = saveLocation(session, req);
 				if(rs) { 
@@ -251,6 +256,7 @@ void* handler(void *arg){
 				} else  { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			case GET_OWNED:
 				rs = getLocationsOfUserByPage(locationBook, session->user.username, *(int*)req.data, locationArr);
 				if(rs > 0){
@@ -260,6 +266,7 @@ void* handler(void *arg){
 				} else {
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
 				}
+				break;
 			default:
 				break;
 		}
