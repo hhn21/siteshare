@@ -28,6 +28,7 @@ void insertAtTail(List*, void*);                                // Insert new no
 void insertAtPosition(List*, void*, int);                       // Insert new node at specific position. Params: 1. List pointer, 2. Data pointer, 3. Position
 void deleteHead(List*);                                         // Delete list head
 void deleteNode(List*, ListNode*);                              // Delete a node
+void deleteNodeByData(List*, void *data);						// Delete a node by data
 void deleteAtPosition(List*, int);                              // Delete a node at specific position
 void reverseList(List *list);									// Reverse list
 void destroyList(List* List);                                   // Free list and its data
