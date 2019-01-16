@@ -19,24 +19,27 @@
 #define BUFF_SIZE 		 7000
 
 //response message from server to client
-#define LOGIN_FAIL_USERNAME_NOT_EXIST "~ Login failed! Username does not exist!"
-#define LOGIN_SUCCESS "~ Login succeeded"
-#define LOGIN_FAIL_PASSWORD_INCORRECT "~ Login failed! Incorrect password!"
+#define LOGIN_FAIL_USERNAME_NOT_EXIST 	"~ Login failed! Username does not exist!"
+#define LOGIN_SUCCESS 					"~ Login succeeded"
+#define LOGIN_FAIL_PASSWORD_INCORRECT 	"~ Login failed! Incorrect password!"
 
-#define SIGNUP_SUCCESS "~ Signup succeeded! Now you can login to system"
-#define SIGNUP_FAIL_USERNAME_EXIST "~ Signup failed! Username already exists"
+#define SIGNUP_SUCCESS 					"~ Signup succeeded! Now you can login to system"
+#define SIGNUP_FAIL_USERNAME_EXIST 		"~ Signup failed! Username already exists"
 
-#define LOGOUT_SUCCESS "~ Logout succeeded"
-#define LOGOUT_FAIL "~ Logout failed"
+#define LOGOUT_SUCCESS 					"~ Logout succeeded"
+#define LOGOUT_FAIL 					"~ Logout failed"
 
-#define SHARE_SUCCESS "~ Share succeeded! The world owes you a new discovery"
-#define SHARE_FAIL "~ Share failed"
+#define SHARE_SUCCESS 					"~ Share succeeded! The world owes you a new discovery"
+#define SHARE_FAIL 						"~ Share failed"
 
-#define SAVE_SUCCESS "~ Saved locations on server"
-#define SAVE_FAIL "~ Some error occured! Save failed"
+#define SAVE_SUCCESS 					"~ Saved locations on server"
+#define SAVE_FAIL 						"~ Some error occured! Save failed"
 
-#define RESTORE_SUCCESS "~ Restored locations successfully"
-#define RESTORE_FAIL "~ Restore failed"
+#define RESTORE_SUCCESS 				"~ Restored locations successfully"
+#define RESTORE_FAIL 					"~ Restore failed"
+
+#define FETCH_SUCCESS 					"~ Fetch unseen locations successfully"
+#define FETCH_FAIL 						"~ Fetch unseen locations failed"
 
 
 typedef int RequestLengthType;
@@ -50,7 +53,7 @@ typedef enum {
 	SAVE_LOCATION,
 	GET_OWNED,
 	GET_SHARED,
-	FETCH,			//fetch new location when user log in
+	FETCH_UNSEEN,			//fetch new location when user log in
 	DELETE_LOCATIONS
 } RequestOpcode;
 

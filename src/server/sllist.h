@@ -29,6 +29,7 @@ void insertAtPosition(List*, void*, int);                       // Insert new no
 void deleteHead(List*);                                         // Delete list head
 void deleteNode(List*, ListNode*);                              // Delete a node
 void deleteAtPosition(List*, int);                              // Delete a node at specific position
+void reverseList(List *list);									// Reverse list
 void destroyList(List* List);                                   // Free list and its data
 
 #define listTraverse(listNode, list) \
