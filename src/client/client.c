@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
                     locationBook = NULL;
                     sessionStatus = UNAUTHENTICATED;
                 } else {
-                    opt = IOPT_MAINMENU;
+                    opt = IOPT_WELCOME;
                 }
 
                 //free malloc for further use
@@ -309,12 +309,12 @@ int main(int argc, char** argv) {
                     req.length = 0;
                     req.data = "";
                     request(socketfd, req, &res);
+
                     if (res.status != SUCCESS) {
-                        printf("Some error occured! Save failed\n");
+                        printf("\n%s\n", (char*)res.data);
                         opt = IOPT_MAINMENU;
                         break;
                     }
-                    printf("Deleted locations on server\n");
                     free(res.data);
                     // send locations to server
                     currPage = 1;
@@ -327,13 +327,14 @@ int main(int argc, char** argv) {
                         request(socketfd, req, &res);
 
                         //receive response from server
-                        printf("\n%s\n", (char*)res.data);
+                        
                         if (res.status != SUCCESS) {
                             opt = IOPT_MAINMENU;
                             break;
                         }
                         free(res.data);
                     } while(rs > 0);
+                    printf("\n%s\n", (char*)res.data);
                     opt = IOPT_MAINMENU;
                 }
             	break;

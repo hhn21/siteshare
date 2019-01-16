@@ -48,7 +48,7 @@ int authenticate(Session *session, char* credentials) {
 			session->user = *a;
 			return 1;
 		}
-		return 2;
+		return -1;
 	}
 	return 0;
 }
@@ -206,22 +206,20 @@ void* handler(void *arg){
 		switch(req.opcode) {
 			case LOGIN:
 				rs = authenticate(session, req.data);
-				switch(rs){
-					case 0:
-						res.status = ERROR; 
-						res.length = strlen(LOGIN_FAIL_USERNAME_NOT_EXIST)+1;
-						res.data = LOGIN_FAIL_USERNAME_NOT_EXIST;
-						break;
-					case 1:
-						res.status = SUCCESS;
-						res.length = strlen(LOGIN_SUCCESS)+1;
-						res.data = LOGIN_SUCCESS;
-						break;
-					case -1:
-						res.status = ERROR;
-						res.length = strlen(LOGIN_FAIL_PASSWORD_INCORRECT)+1;
-						res.data = LOGIN_FAIL_PASSWORD_INCORRECT;
-						break;
+				if (rs == -1){
+					res.status = ERROR;
+					res.length = strlen(LOGIN_FAIL_PASSWORD_INCORRECT)+1;
+					res.data = LOGIN_FAIL_PASSWORD_INCORRECT;
+				}
+				else if (rs == 0){
+					res.status = ERROR; 
+					res.length = strlen(LOGIN_FAIL_USERNAME_NOT_EXIST)+1;
+					res.data = LOGIN_FAIL_USERNAME_NOT_EXIST;
+				}
+				else if (rs == 1){
+					res.status = SUCCESS;
+					res.length = strlen(LOGIN_SUCCESS)+1;
+					res.data = LOGIN_SUCCESS;
 				}
 				break;
 			case SIGNUP:

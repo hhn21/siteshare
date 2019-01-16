@@ -37,8 +37,6 @@
 
 #define RESTORE_SUCCESS "~ Restored locations successfully"
 #define RESTORE_FAIL "~ Restore failed"
-// #define LOGOUT_FAIL "~ Logout failed"
-// #define LOGOUT_FAIL "~ Logout failed"
 
 
 typedef int RequestLengthType;
