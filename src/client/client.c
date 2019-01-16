@@ -198,13 +198,61 @@ int main(int argc, char** argv) {
 
 /******************************** 2. Show local location ********************************/
             case IOPT_SHOW_LOCAL:
+                location = NULL;
                 opt = showLocalLocation(locationBook, username, &location);
+                if(location != NULL) {
+                    // TODO: selected 1 location
+                }
                 break;
 
 /******************************** 3. Show server location ********************************/
             case IOPT_SHOW_SERVER:
-                // opt = showLocalLocation(locationBook, username);
-                printf("TODO: show server\n");
+                currPage = 1;
+                do {
+                    req.opcode = GET_OWNED;
+                    req.length = sizeof(int);
+                    req.data = &currPage;
+                    request(socketfd, req, &res);
+                    if (res.status == SUCCESS) {
+                        locationNum = res.length / sizeof(Location);
+                        if(locationNum > 0) {
+                            printLocationLabel();
+                            locations = res.data;
+                            for(int i = 0; i < locationNum; i++) {
+                                printLocationInfo(locations[i], i + 1);
+                            }
+                        } else {
+                            printf("\n\nNo reults\n");
+                        }
+                        printf("Page %d ", currPage);
+                        if(currPage > 1) printf("Type '\\p' to prev page ");
+                        if(locationNum == PAGE_SIZE) printf("Type '\\n' to next page");
+                        rs = pageNavigate(1, locationNum);
+                        if(rs == -2) { 
+                            if(currPage == 1) {
+                                printf("Error! No previous page!\n");
+                                continue;
+                            }
+                            currPage -= 1; continue; 
+                        }
+                        if(rs == -1) { 
+                            if(locationNum != PAGE_SIZE) {
+                                printf("Error! No next page!\n");
+                                continue;
+                            }
+                            currPage += 1; continue; 
+                        }
+                        // TODO: selected 1 location
+                        if(rs >= 0) {
+                            opt = IOPT_MAINMENU;
+                            break; 
+                        }
+                    } else {
+                        opt = IOPT_MAINMENU;
+                        break;
+                    }
+                    free(res.data); 
+                } while(1);
                 break;
 
 /******************************** 4. Share location ********************************/

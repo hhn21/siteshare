@@ -181,4 +181,36 @@ Option confirmSaveLocation();
  */
 Option confirmRestoreLocation();
 
+/* Print location table labels*/
+void printLocationLabel();
+
+/* Print location table info
+ * Params:
+ *      l Location to print
+ *      index index of location
+ */
+void printLocationInfo(Location l, int index);
+
+/* input page navigation commands
+ * Return:
+ *      -2 if inputed \p
+ *      -1 if inputed \n
+ *      0 if inputed nothing
+ *      > 0 value if inputed a number within [min,max] 
+ */
+int pageNavigate(int min, int max);
+
+/* input page navigation commands
+ * Params:
+ *      book LocationBook
+ *      username
+ *      location selected location - set to NULL if not selected
+ * Return:
+ *      -2 if inputed \p
+ *      -1 if inputed \n
+ *      0 if inputed nothing
+ *      > 0 value if inputed a number within [min,max] 
+ */
+Option showLocalLocation(LocationBook *locationBook, char *username, Location **location);
+
 #endif

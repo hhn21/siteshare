@@ -112,5 +112,5 @@ void deleteAtPosition(List *list, int p){
 
 void destroyList(List *list){
     while(list->root != NULL) deleteHead(list);
-    printf("Danh sach da duoc giai phong\n");
+    printf("List destroyed\n");
 }
