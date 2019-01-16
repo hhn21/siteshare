@@ -150,7 +150,7 @@ int deleteLocationOfUser(LocationBook *book, char* username);
  *   Location List indexed by owner name
  *   NULL if not found
  */
-void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations);
+void getUnseenLocationsByOwner(LocationBook* book, char* owner, List **unseenLocations);
 
 /*
  * get locations of an user indexed by giving page

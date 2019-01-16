@@ -194,6 +194,7 @@ int saveLocationOfUser(LocationBook* book, char *username) {
 	}
 	else {
 		locations = getLocationsByOwner(book, username);
+		if(locations == NULL) return 0;
 		reverseList(locations);
 		listTraverse(node, locations){
 			l = (Location*)node->data;
@@ -303,15 +304,18 @@ int deleteLocationOfUser(LocationBook *book, char* username){
  *   Location List indexed by owner name
  *   NULL if not found
  */
-void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLocations) {
+void getUnseenLocationsByOwner(LocationBook* book, char* owner, List **unseenLocations) {
 	List *locations = getLocationsByOwner(book, owner);
+	if(locations == NULL) return;
+
+	*unseenLocations = newList();
 	ListNode *node;
 	Location *l;
 
 	listTraverse(node, locations) {
 		l = (Location*)node->data;
 		if(l->seen == 0) {
-			insertAtTail(unseenLocations, node->data);
+			insertAtTail(*unseenLocations, node->data);
 		}
 	}
 }
@@ -327,8 +331,9 @@ void getUnseenLocationsByOwner(LocationBook* book, char* owner, List *unseenLoca
  *   Number of locations have been gotten
  */
 int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page, Location *result){
-	List *unseenLocations = newList();
-	getUnseenLocationsByOwner(book, username, unseenLocations);
+	List *unseenLocations = NULL;
+	getUnseenLocationsByOwner(book, username, &unseenLocations);
+	if(unseenLocations == NULL) return 0;
 
 	ListNode *node = unseenLocations->root;
 	Location *l;

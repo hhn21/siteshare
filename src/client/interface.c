@@ -443,7 +443,7 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
     int printPageInfo;
 
     locations = getLocationsByOwner(book, username);
-    if(locations == NULL) {
+    if(locations == NULL || locations->root == NULL) {
         printf(USER_NO_LOCATION);
         return IOPT_MAINMENU;
     }
@@ -506,8 +506,10 @@ Option showLocalLocation(LocationBook *book, char *username, Location **location
                 }
 
                 // else
-                *location = l_a[pageCmd - 1];
-                return IOPT_SHARE;
+                if(pageCmd > 0) {
+                    *location = l_a[pageCmd - 1];
+                    return IOPT_SHARE;
+                }
             } while (1);
         }
     }

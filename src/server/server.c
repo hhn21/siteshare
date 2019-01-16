@@ -81,6 +81,7 @@ int signup(char* credentials) {
 		strcpy(a->password, password);
 		a->isActive = 1;
 		insertAtTail(accountList, a);
+		createUserDBFile(username);
 		saveAccountToFile(accountList, "./data/account.txt");
 		rs = 1;
 	}
