@@ -277,14 +277,15 @@ int main(int argc, char** argv) {
                         req.length = rs * sizeof(Location);
                         req.data = locationArr;
                         request(socketfd, req, &res);
+
+                        //receive response from server
+                        printf("\n%s\n", (char*)res.data);
                         if (res.status != SUCCESS) {
-                            printf("Some error occured! Save failed\n");
                             opt = IOPT_MAINMENU;
                             break;
                         }
                         free(res.data);
                     } while(rs > 0);
-                    printf("Saved locations on server\n");
                     opt = IOPT_MAINMENU;
                 }
             	break;
@@ -297,6 +298,7 @@ int main(int argc, char** argv) {
                     opt = IOPT_WELCOME; 
                     break;
                 }
+                
                 opt = confirmRestoreLocation();
                 if(opt == IOPT_RESTORE) {
                     // delete local locations

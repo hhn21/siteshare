@@ -210,36 +210,52 @@ void* handler(void *arg){
 				rs = authenticate(session, req.data);
 				switch(rs){
 					case 0:
-						res.status = ERROR; 	res.length = 27; 	res.data = "~ Username does not exist!";
+						res.status = ERROR; 
+						res.length = strlen(LOGIN_FAIL_USERNAME_NOT_EXIST)+1;
+						res.data = LOGIN_FAIL_USERNAME_NOT_EXIST;
 						break;
 					case 1:
-						res.status = SUCCESS; 	res.length = 18; 	res.data = "~ Login succeeded";
+						res.status = SUCCESS;
+						res.length = strlen(LOGIN_SUCCESS)+1;
+						res.data = LOGIN_SUCCESS;
 						break;
 					case -1:
-						res.status = ERROR; 	res.length = 22; 	res.data = "~ Incorrect password!";
+						res.status = ERROR;
+						res.length = strlen(LOGIN_FAIL_PASSWORD_INCORRECT)+1;
+						res.data = LOGIN_FAIL_PASSWORD_INCORRECT;
 						break;
 				}
 				break;
 			case SIGNUP:
 				rs = signup(req.data);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 48; 	res.data = "~ Signup succeeded! Now you can login to system"; 
+					res.status = SUCCESS;
+					res.length = strlen(SIGNUP_SUCCESS)+1;
+					res.data = SIGNUP_SUCCESS; 
 				} else  { 
-					res.status = ERROR; 	res.length = 41; 	res.data = "~ Signup failed! Username already exists"; 
+					res.status = ERROR;
+					res.length = strlen(SIGNUP_FAIL_USERNAME_EXIST)+1;
+					res.data = SIGNUP_FAIL_USERNAME_EXIST; 
 				}
 				break;
 			case LOGOUT:
 				rs = logout(session);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 19; 	res.data = "~ Logout succeeded"; 
+					res.status = SUCCESS;
+					res.length = strlen(LOGOUT_SUCCESS)+1;
+					res.data = LOGOUT_SUCCESS; 
 				} else  { 
-					res.status = ERROR; 	res.length = 16; 	res.data = "~ Logout failed"; 
+					res.status = ERROR;
+					res.length = strlen(LOGOUT_FAIL)+1;
+					res.data = LOGOUT_FAIL; 
 				}
 				break;
 			case SHARE_LOCATION:
 				rs = shareLocation(session, req);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 19; 	res.data = "~ Share succeeded!"; 
+					res.status = SUCCESS;
+					res.length = strlen(SHARE_SUCCESS)+1;
+					res.data = SHARE_SUCCESS; 
 				} else { 
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; //TODO: check user
 				}
@@ -263,9 +279,13 @@ void* handler(void *arg){
 			case SAVE_LOCATION:
 				rs = saveLocation(session, req);
 				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
+					res.status = SUCCESS;
+					res.length = strlen(SAVE_SUCCESS) +1;
+					res.data = SAVE_SUCCESS; 
 				} else  { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+					res.status = ERROR;
+					res.length = strlen(SAVE_FAIL) +1;
+					res.data = SAVE_FAIL; 
 				}
 				break;
 			case GET_OWNED:
@@ -275,7 +295,9 @@ void* handler(void *arg){
 					res.length = rs * sizeof(Location);
 					res.data = locationArr;
 				} else {
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+					res.status = ERROR;
+					res.length = strlen(RESTORE_FAIL) +1;
+					res.data = RESTORE_FAIL; 
 				}
 				break;
 			default:
