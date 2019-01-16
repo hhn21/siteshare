@@ -182,13 +182,15 @@ void printMainMenu(char username[]){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("Main menu (logged in as %s)\n", username);
     printf("1. Add new location\n");
-    printf("2. Share location\n");
-    printf("3. Save to server\n");
-    printf("4. Restore from server\n");
-    printf("5. Log out\n");
-    printf("6. Exit\n");
+    printf("2. Show local location\n");
+    printf("3. Show server location\n");
+    printf("4. Share location\n");
+    printf("5. Save to server\n");
+    printf("6. Restore from server\n");
+    printf("7. Log out\n");
+    printf("8. Exit\n");
     printf("----------\n");
-    printf("Please choose from 1 to 6\n");
+    printf("Please choose from 1 to 8\n");
     printf("Your choice: ");
 }
 
@@ -206,19 +208,21 @@ Option mainMenu(char username[]){
         fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
         opt = atoi(buf);
-        if (opt < 1 || opt > 6)
+        if (opt < 1 || opt > 8)
         {
-            printf("\n~ Please inut a number from 1 to 6\n");
+            printf("\n~ Please inut a number from 1 to 8\n");
         }
-    } while (opt < 1 || opt > 6);
+    } while (opt < 1 || opt > 8);
 
     switch(opt) {
         case 1: return IOPT_ADD;
-        case 2: return IOPT_SHARE;
-        case 3: return IOPT_SAVE;
-        case 4: return IOPT_RESTORE;
-        case 5: return IOPT_LOGOUT;
-        case 6: return IOPT_EXIT;
+        case 2: return IOPT_SHOW_LOCAL;
+        case 3: return IOPT_SHOW_SERVER;
+        case 4: return IOPT_SHARE;
+        case 5: return IOPT_SAVE;
+        case 6: return IOPT_RESTORE;
+        case 7: return IOPT_LOGOUT;
+        case 8: return IOPT_EXIT;
     }
     return IOPT_EXIT;
 }
@@ -251,91 +255,7 @@ Option inputSharingReceiver(char *receiver){
  *      IOPT_SHARE otherwise
  */
 Option selectLocationToShare(LocationBook *book, char *username, Location **location) {
-    List *locations;
-    ListNode *node2;
-    ListNode tmp;
-    Location *l;
-    Location *l_a[10];
-    int j = 0;
-    char timeString[26];
-    struct tm* tm_info;
-    char buf[OPT_MAX_LEN];
-    int opt = 0;
-    int currPage = 1;
-    int printPageInfo;
-
-    locations = getLocationsByOwner(book, username);
-    if(locations == NULL) {
-        printf("You don't have any location to share\n");
-        return IOPT_MAINMENU;
-    }
-    
-    printf("\n%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
-    listTraverse(node2, locations){
-        l = (Location*)node2->data;
-        l_a[j] = l;
-        j = j % 10 + 1;
-        tm_info = localtime(&(l->createdAt));
-        strftime(timeString, 26, "%Y-%m-%d %H:%M:%S", tm_info);
-        printf("%-5d %-20s %-30s %-30s %-50s \n", j, timeString, l->category, l->name, l->note);
-        printPageInfo = 1;
-        if(j % 10 == 0 || node2->next == NULL) { // if reach the end of page or the end of list 
-            do {
-                if(printPageInfo == 1) {
-                    printf("\nPage %d \t", currPage);
-                    if(currPage > 1) printf("Type '\\p' to prev page, ");
-                    if(node2->next != NULL) printf("Type '\\n' to next page");
-                }
-                printf("\n\nChoose location (1-%d), enter to quit: ", j);
-                fgets(buf, OPT_MAX_LEN, stdin);
-                buf[strlen(buf) - 1] = '\0';
-
-                // if inputed "\p"
-                if(strcmp(buf, "\\p") == 0) {
-                    if(currPage == 1) {
-                        printf("Error. No previous page!\n");
-                        continue;
-                    }
-                    // go back to previous page
-                    currPage -= 1;
-                    tmp.next = locations->root;
-                    node2 = &tmp;
-                    for(int i = 0; i < (currPage - 1) * 10; i++) node2 = node2->next;
-                    j = 0;
-                    break;
-                }
-
-                // if inputed "\n"
-                if(strcmp(buf, "\\n") == 0) {
-                    if(node2->next == NULL) {
-                        printf("Error. Reached the end of result!\n");
-                        continue;
-                    }
-                    currPage += 1;
-                    printf("\n\n%-5s %-20s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
-                    break;
-                }
-
-                // if inputed "\0" (blank)
-                if(buf[0] == '\0') {
-                    printf("You input nothing, which means back\n");
-                    *location = NULL;
-                    return IOPT_MAINMENU;
-                }
-
-                // else
-                opt = atoi(buf);
-                if(opt < 1 || opt > j) {
-                    printf("Invalid input, please try again\n");
-                    printPageInfo = 0;
-                    continue;
-                }
-                *location = l_a[opt - 1];
-                return IOPT_SHARE;
-            } while (1);
-        }
-    }
-    return IOPT_SHARE;
+    return showLocalLocation(book, username, location);
 }
 
 /* Confirm to delete all locations on server and upload all location on local to server
@@ -380,4 +300,105 @@ Option confirmRestoreLocation(){
     } while (1);
     
     return IOPT_MAINMENU;
+}
+
+void printLocationLabel() {
+    printf("\n%-5s %-30s %-30s %-30s %-50s\n", "#", "Created at", "Category", "Name", "Note");
+}
+
+void printLocationInfo(Location l, int index){
+    char timeString[26];
+    struct tm* tm_info;
+
+    tm_info = localtime(&(l.createdAt));
+    strftime(timeString, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+    printf("%-5d %-30s %-30s %-30s %-50s \n", index, timeString, l.category, l.name, l.note);
+}
+
+Option showLocalLocation(LocationBook *book, char *username, Location **location){
+    List *locations;
+    ListNode *node2;
+    ListNode tmp;
+    Location *l;
+    Location *l_a[10];
+    int j = 0;
+    char buf[OPT_MAX_LEN];
+    int opt = 0;
+    int currPage = 1;
+    int printPageInfo;
+
+    locations = getLocationsByOwner(book, username);
+    if(locations == NULL) {
+        printf("You don't have any location\n");
+        return IOPT_MAINMENU;
+    }
+    
+    printLocationLabel();
+    listTraverse(node2, locations){
+        l = (Location*)node2->data;
+        l_a[j] = l;
+        j = j % 10 + 1;
+        printLocationInfo(*l, j);
+        printPageInfo = 1;
+        if(j % 10 == 0 || node2->next == NULL) { // if reach the end of page or the end of list 
+            do {
+                if(printPageInfo == 1) {
+                    printf("\nPage %d \t", currPage);
+                    if(currPage > 1) printf("Type '\\p' to prev page, ");
+                    if(node2->next != NULL) printf("Type '\\n' to next page");
+                }
+                printf("\n\nChoose location (1-%d), enter to quit: ", j);
+                fgets(buf, OPT_MAX_LEN, stdin);
+                buf[strlen(buf) - 1] = '\0';
+
+                // if inputed "\p"
+                if(strcmp(buf, "\\p") == 0) {
+                    if(currPage == 1) {
+                        printf("Error. No previous page!\n");
+                        printPageInfo = 0;
+                        continue;
+                    }
+                    // go back to previous page
+                    currPage -= 1;
+                    tmp.next = locations->root;
+                    node2 = &tmp;
+                    for(int i = 0; i < (currPage - 1) * 10; i++) node2 = node2->next;
+                    j = 0;
+                    printLocationLabel();
+                    break;
+                }
+
+                // if inputed "\n"
+                if(strcmp(buf, "\\n") == 0) {
+                    if(node2->next == NULL) {
+                        printf("Error. Reached the end of result!\n");
+                        printPageInfo = 0;
+                        continue;
+                    }
+                    currPage += 1;
+                    printLocationLabel();
+                    break;
+                }
+
+                // if inputed "\0" (blank)
+                if(buf[0] == '\0') {
+                    printf("You input nothing, which means back\n");
+                    *location = NULL;
+                    return IOPT_MAINMENU;
+                }
+
+                // else
+                opt = atoi(buf);
+                if(opt < 1 || opt > j) {
+                    printf("Invalid input, please try again\n");
+                    printPageInfo = 0;
+                    continue;
+                }
+                *location = l_a[opt - 1];
+                return IOPT_SHARE;
+            } while (1);
+        }
+    }
+    return IOPT_SHARE;
 }
