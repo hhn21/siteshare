@@ -110,6 +110,19 @@ void deleteAtPosition(List *list, int p){
     }
 }
 
+void reverseList(List *list){    
+    if(list->root == NULL || list->root->next == NULL) return;
+    ListNode  *prev = NULL, *tmp;
+    while(tmp != NULL){
+        tmp = list->root->next;
+        list->root->next = prev;
+        prev = list->root;
+        list->root = tmp;
+    }
+    list->root = prev;
+}
+
 void destroyList(List *list){
     while(list->root != NULL) deleteHead(list);
+    printf("List destroyed\n");
 }
