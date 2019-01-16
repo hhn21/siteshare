@@ -29,7 +29,7 @@ typedef enum {
 	SAVE_LOCATION,	//save location to server
 	GET_OWNED,		
 	GET_SHARED,
-	FETCH,			//fetch new location when user log in
+	FETCH_UNSEEN,			//fetch new location when user log in
 	DELETE_LOCATIONS
 } RequestOpcode;
 

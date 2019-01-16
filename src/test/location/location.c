@@ -342,6 +342,7 @@ int getUnseenLocationsOfUserByPage(LocationBook *book, char* username, int page,
 	for(i = 0; i < PAGE_SIZE; i++) {
 		if(node == NULL) break;
 		l = (Location*)node->data;
+		l->seen = 1;
 		result[i] = *l;
 		node = node->next;
 	}

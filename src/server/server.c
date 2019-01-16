@@ -21,11 +21,10 @@ List *accountList;			//list of account
 LocationBook *locationBook;	//TODO: ??
 List *clientSessionList;	//TODO: ??
 
-//TODO
-pthread_mutex_t accountListMutex;	//TODO
-pthread_mutex_t clientSessionMutex;	//TODO
-pthread_mutex_t locationBookMutex;	//TODO
-pthread_mutex_t locationDBMutex;	//TODO
+pthread_mutex_t accountListMutex;	
+pthread_mutex_t clientSessionMutex;	
+pthread_mutex_t locationBookMutex;	
+pthread_mutex_t locationDBMutex;	
 
 /* try to authenticate a client credentials
  * params:
@@ -130,24 +129,6 @@ int shareLocation(Session *session, Request req){
 	pthread_mutex_unlock(&locationDBMutex);
 
 	return 1;
-}
-
-/* fetch unseen shared location for user
- * params:
- *		session: session of client 
- * return:
- *		0 if fetch fail
- *		1 if fetch success
- */
-int fetch(Session *session, char* username){
-	//check if user logged in yet
-	if(session->status == UNAUTHENTICATED) return 0;
-
-	//find the user's file
-	return 1;
-
-	//TODO: find the list that is not seen
-	//TODO: send em to user, mark them as seen
 }
 
 int deleteLocations(Session *session) {
@@ -256,12 +237,28 @@ void* handler(void *arg){
 					res.status = ERROR; 	res.length = 0; 	res.data = ""; //TODO: check user
 				}
 				break;
-			case FETCH:
-				rs = fetch(session, req.data);
-				if(rs) { 
-					res.status = SUCCESS; 	res.length = 0; 	res.data = ""; 
-				} else  { 
-					res.status = ERROR; 	res.length = 0; 	res.data = ""; 
+			case FETCH_UNSEEN:
+				if(session->status != LOGGED_IN) {
+					rs = -1;
+				}
+				else {
+					pthread_mutex_lock(&locationBookMutex);
+					rs = getUnseenLocationsOfUserByPage(locationBook, session->user.username, *(int*)req.data, locationArr);
+					pthread_mutex_unlock(&locationBookMutex);
+
+					pthread_mutex_lock(&locationDBMutex);
+					saveLocationOfUser(locationBook, session->user.username);
+					pthread_mutex_unlock(&locationDBMutex);
+				}
+
+				if(rs >= 0){
+					res.status = SUCCESS;
+					res.length = rs * sizeof(Location);
+					res.data = locationArr;
+				} else {
+					res.status = ERROR;
+					res.length = 0;
+					res.data = ""; 
 				}
 				break;
 			case DELETE_LOCATIONS:
@@ -285,7 +282,14 @@ void* handler(void *arg){
 				}
 				break;
 			case GET_OWNED:
-				rs = getLocationsOfUserByPage(locationBook, session->user.username, *(int*)req.data, locationArr);
+				if(session->status != LOGGED_IN) 
+					rs = -1;
+				else {
+					pthread_mutex_lock(&locationBookMutex);
+					rs = getLocationsOfUserByPage(locationBook, session->user.username, *(int*)req.data, locationArr);
+					pthread_mutex_unlock(&locationBookMutex);
+				}
+
 				if(rs >= 0){
 					res.status = SUCCESS;
 					res.length = rs * sizeof(Location);
