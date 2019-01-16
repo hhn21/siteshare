@@ -360,6 +360,7 @@ int main(int argc, char** argv) {
                         request(socketfd, req, &res);
                         if (res.status == SUCCESS) {
                             locationNum = res.length / sizeof(Location);
+                            if(locationNum == 0) break;
                             locations = res.data;
                             for(int i = 0; i < locationNum; i++) {
                                 location = malloc(sizeof(Location));
