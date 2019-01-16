@@ -268,7 +268,7 @@ void* handler(void *arg){
 				break;
 			case GET_OWNED:
 				rs = getLocationsOfUserByPage(locationBook, session->user.username, *(int*)req.data, locationArr);
-				if(rs > 0){
+				if(rs >= 0){
 					res.status = SUCCESS;
 					res.length = rs * sizeof(Location);
 					res.data = locationArr;
