@@ -377,22 +377,24 @@ int main(int argc, char** argv) {
                     rs = pageNavigate(1, userNum);
                     if(rs > 0) {
                         strcpy(receiver, users[rs - 1].username);
+                        free(res.data);
                         break;
                     }
-                    free(res.data);
                     if(rs == -2) { 
                         if(currPage == 1) {
                             printf(NO_PREV_PAGE);
+                            free(res.data);
                             continue;
                         }
-                        currPage -= 1; continue; 
+                        currPage -= 1; free(res.data); continue; 
                     }
                     if(rs == -1) { 
-                        if(locationNum != PAGE_SIZE) {
+                        if(userNum != PAGE_SIZE) {
                             printf(NO_NEXT_PAGE);
+                            free(res.data);
                             continue;
                         }
-                        currPage += 1; continue; 
+                        currPage += 1; free(res.data); continue; 
                     }
                     if(rs == 0) {
                         free(res.data);

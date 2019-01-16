@@ -125,18 +125,19 @@ Account* findAccountByName(List* list, char* username) {
 }
 
 /*
- * get users indexed by giving page
+ * get users indexed by giving page except 1 user with username store in except
  * Params:
  *   accountList account list to get
  *   page int page number
  *   result array to save the result
+ *	 except username to except
  * Return:
  *   Number of users have been gotten
  */
-int getUserByPage(List* accountList, int page, Account *result){
+int getUserByPageExcept(List* accountList, int page, Account *result, char *except){
 	ListNode *node = accountList->root;
 	Account *a;
-	int i;
+	int i, j = 0;
 
 	// go to desired page
 	for(i = 0; i < (page-1) * ACC_PAGE_SIZE; i++){
@@ -144,12 +145,14 @@ int getUserByPage(List* accountList, int page, Account *result){
 		node = node->next;
 	}
 
-	for(i = 0; i < ACC_PAGE_SIZE; i++) {
+	for(i = 0; j < ACC_PAGE_SIZE; i++) {
 		if(node == NULL) break;
 		a = (Account*)node->data;
-		strcpy(result[i].username, a->username);
+		if(strcmp(except, a->username) != 0){
+			strcpy(result[j++].username, a->username);
+		}
 		node = node->next;
 	}
 
-	return i;
+	return j;
 }
