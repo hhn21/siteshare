@@ -145,7 +145,7 @@ int getUserByPageExcept(List* accountList, int page, Account *result, char *exce
 		node = node->next;
 	}
 
-	for(i = 0; i < ACC_PAGE_SIZE; i++) {
+	for(i = 0; j < ACC_PAGE_SIZE; i++) {
 		if(node == NULL) break;
 		a = (Account*)node->data;
 		if(strcmp(except, a->username) != 0){
