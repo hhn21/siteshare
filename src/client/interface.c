@@ -347,7 +347,7 @@ void printLocationInfo(Location l, int index){
  *      > 0 value if inputed a number within [min,max] 
  */
 int pageNavigate(int min, int max) {
-    int opt;
+    int opt = 0;
     char buf[OPT_MAX_LEN];
 
     while(1) {
@@ -363,8 +363,9 @@ int pageNavigate(int min, int max) {
             printf("\n~ Invalid input, please try again\n");
             continue;
         }
+        break;
     }
-    return 0;
+    return opt;
 }
 
 /* input page navigation commands
