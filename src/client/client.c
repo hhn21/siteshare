@@ -331,8 +331,12 @@ int main(int argc, char** argv) {
                         printf("Page %d ", currPage);
                         if(currPage > 1) printf(PREV_PAGE_HOW);
                         if(locationNum == PAGE_SIZE) printf(NEXT_PAGE_HOW);
-                        printf("\nChoose one to save to local database");
-                        rs = pageNavigate(1, locationNum);
+                        if(locationNum > 0) {
+                            printf("\nChoose one to save to local database");
+                            rs = pageNavigate(1, locationNum);
+                        } else {
+                            rs = pageNavigateNoNumber();
+                        }
                         if(rs == -2) { 
                             if(currPage == 1) {
                                 printf(NO_PREV_PAGE);
