@@ -331,31 +331,61 @@ int main(int argc, char** argv) {
                         printf("Page %d ", currPage);
                         if(currPage > 1) printf(PREV_PAGE_HOW);
                         if(locationNum == PAGE_SIZE) printf(NEXT_PAGE_HOW);
-                        rs = pageNavigateNoNumber();
+                        printf("\nChoose one to save to local database");
+                        rs = pageNavigate(1, locationNum);
                         if(rs == -2) { 
                             if(currPage == 1) {
                                 printf(NO_PREV_PAGE);
+                                free(res.data); 
                                 continue;
                             }
-                            currPage -= 1; continue; 
+                            currPage -= 1; free(res.data); continue; 
                         }
                         if(rs == -1) { 
                             if(locationNum != PAGE_SIZE) {
                                 printf(NO_NEXT_PAGE);
+                                free(res.data); 
                                 continue;
                             }
-                            currPage += 1; continue; 
+                            currPage += 1; free(res.data); continue; 
                         }
                         if(rs == 0) {
                             opt = IOPT_MAINMENU;
+                            free(res.data); 
                             break; 
+                        }
+                        if(rs > 0) {
+                            if(confirmRestoreOneLocation() == IOPT_RESTORE_ONE){
+                                opt = IOPT_RESTORE_ONE;
+                                tmpLocation = locations[rs - 1];
+                                free(res.data); 
+                                break; 
+                            } else {
+                                free(res.data); 
+                                continue;
+                            }
                         }
                     } else {
                         opt = IOPT_MAINMENU;
+                        free(res.data); 
                         break;
                     }
                     free(res.data); 
                 } while(1);
+                break;
+
+/******************************** 4. Share location ********************************/
+            case IOPT_RESTORE_ONE:
+                location = malloc(sizeof(Location));
+                memcpy(location, &tmpLocation, sizeof(Location));
+
+                // add location to in-memory book
+                addLocationtoBook(locationBook, location);
+
+                // save location to db
+                addNewLocationOfUser(location, username);
+                printf(ADD_LOCATION_SUCCESS);
+                opt = IOPT_MAINMENU;
                 break;
 
 /******************************** 4. Share location ********************************/
