@@ -19,6 +19,7 @@ typedef enum {
     IOPT_UPDATE_LOCAL,
     IOPT_DELETE_LOCAL,
     IOPT_SHOW_SERVER,
+    IOPT_RESTORE_ONE,
     IOPT_SHARE,
     IOPT_SAVE,
     IOPT_RESTORE,
@@ -235,5 +236,12 @@ Option locationUpdateMenu();
  *      IOPT_UPDATE_LOCAL
  */
 Option inputUpdateLocationInfo(Location old, Location *new);
+
+/* Confirm to add 1 location fetched from server to local database
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_RESTORE_ONE if confirm
+ */
+Option confirmRestoreOneLocation();
 
 #endif

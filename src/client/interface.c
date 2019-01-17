@@ -530,7 +530,7 @@ Option confirmSaveLocation(){
     printf(ASK_SURE_DELETE_SERVER);
     
     do {
-        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
+        fgets(buf, OPT_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
         if(strcmp(buf, "y") == 0) return IOPT_SAVE;
         if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
@@ -554,7 +554,7 @@ Option confirmRestoreLocation(){
     printf(ASK_SURE_DELETE_LOCAL);
     
     do {
-        fgets(buf, L_NOTE_NAME_MAX_LEN, stdin);
+        fgets(buf, OPT_MAX_LEN, stdin);
         buf[strlen(buf) - 1] = '\0';
         if(strcmp(buf, "y") == 0) return IOPT_RESTORE;
         if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
@@ -630,4 +630,26 @@ Option inputUpdateLocationInfo(Location old, Location *new){
     }
 
     return IOPT_UPDATE_LOCAL;
+}
+
+/****************************** restore one location from server ******************************/
+/* Confirm to add 1 location fetched from server to local database
+ * Return:
+ *      IOPT_MAINMENU if not confirm
+ *      IOPT_RESTORE_ONE if confirm
+ */
+Option confirmRestoreOneLocation(){
+    char buf[OPT_MAX_LEN];
+
+    printf(ASK_SURE_RESTORE_ONE_LOCATION);
+    
+    do {
+        fgets(buf, OPT_MAX_LEN, stdin);
+        buf[strlen(buf) - 1] = '\0';
+        if(strcmp(buf, "y") == 0) return IOPT_RESTORE_ONE;
+        if(strcmp(buf, "n") == 0) return IOPT_MAINMENU;
+        printf("\n~ Invalid input, please try again: ");
+    } while (1);
+    
+    return IOPT_MAINMENU;
 }

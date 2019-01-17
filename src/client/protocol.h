@@ -27,6 +27,7 @@
 #define USER_NO_LOCATION "\n~ You don't have any location\n"
 #define ASK_SURE_DELETE_SERVER "\n~ This operation will delete all locations on server!\n~ Do you want to continue? (y/n): "
 #define ASK_SURE_DELETE_LOCAL "\n~ This operation will delete all local locations!\n~ Do you want to continue? (y/n): "
+#define ASK_SURE_RESTORE_ONE_LOCATION "\n~ Restore 1 location from server!\n~ Do you want to continue? (y/n): "
 #define VIEW_SERVER "Viewing Server locations:\n"
 #define VIEW_LOCAL "Viewing local locations:\n"
 #define UPDATING_LOCATION "Updating locations:\n"
