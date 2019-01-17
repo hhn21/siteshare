@@ -278,7 +278,7 @@ void* handler(void *arg){
 					pthread_mutex_unlock(&locationDBMutex);
 				}
 
-				if(rs > 0){
+				if(rs >= 0){
 					res.status = SUCCESS;
 					res.length = rs * sizeof(Location);
 					res.data = locationArr;

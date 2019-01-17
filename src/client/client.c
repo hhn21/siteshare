@@ -82,7 +82,11 @@ int main(int argc, char** argv) {
                     req.opcode = FETCH_UNSEEN;
                     req.length = sizeof(int);
                     req.data = &currPage;
-                    request(socketfd, req, &res);
+                    if(request(socketfd, req, &res) < 0) {
+                        printf("Connection lost\n");
+                        opt = IOPT_EXIT;
+                        break;
+                    }
                     
                     if (res.status == SUCCESS) {
                         locationNum = res.length / sizeof(Location);
@@ -109,7 +113,7 @@ int main(int argc, char** argv) {
                         break;
                     }
                 } while(1);
-
+                if(opt == IOPT_EXIT) break;
                 opt = mainMenu(username);
                 break;
 
@@ -123,7 +127,11 @@ int main(int argc, char** argv) {
             	req.opcode = LOGIN;
             	req.length = buffSize;
             	req.data = buff;
-            	request(socketfd, req, &res);
+                if(request(socketfd, req, &res) < 0) {
+                    printf("Connection lost\n");
+                    opt = IOPT_EXIT;
+                    break;
+                }
             	
             	//receive response from server
                 printf("\n%s\n", (char*)res.data);
@@ -153,7 +161,11 @@ int main(int argc, char** argv) {
             	req.opcode = SIGNUP;
             	req.length = buffSize;
             	req.data = buff;
-            	request(socketfd, req, &res);
+                if(request(socketfd, req, &res) < 0) {
+                    printf("Connection lost\n");
+                    opt = IOPT_EXIT;
+                    break;
+                }
 
             	//receive response from server
                 printf("\n%s\n", (char*)res.data);
@@ -183,7 +195,11 @@ int main(int argc, char** argv) {
                 req.opcode = LOGOUT;
                 req.length = buffSize;
                 req.data = buff;
-                request(socketfd, req, &res);
+                if(request(socketfd, req, &res) < 0) {
+                    printf("Connection lost\n");
+                    opt = IOPT_EXIT;
+                    break;
+                }
 
             	//receive response from server
                 printf("\n%s\n", (char*)res.data);
@@ -294,7 +310,11 @@ int main(int argc, char** argv) {
                     req.opcode = GET_OWNED;
                     req.length = sizeof(int);
                     req.data = &currPage;
-                    request(socketfd, req, &res);
+                    if(request(socketfd, req, &res) < 0) {
+                        printf("Connection lost\n");
+                        opt = IOPT_EXIT;
+                        break;
+                    }
                     if (res.status == SUCCESS) {
                         locationNum = res.length / sizeof(Location);
                         if(locationNum > 0) {
@@ -357,7 +377,11 @@ int main(int argc, char** argv) {
                     req.opcode = GET_USERS;
                     req.length = sizeof(currPage);
                     req.data = &currPage;
-                    request(socketfd, req, &res);
+                    if(request(socketfd, req, &res) < 0) {
+                        printf("Connection lost\n");
+                        opt = IOPT_EXIT;
+                        break;
+                    }
                     if (res.status == SUCCESS) {
                         userNum = res.length / sizeof(Account);
                         if(userNum > 0) {
@@ -402,7 +426,7 @@ int main(int argc, char** argv) {
                         break;
                     }
                 } while(opt != IOPT_MAINMENU);
-                if(opt == IOPT_MAINMENU) break;
+                if(opt == IOPT_MAINMENU || opt == IOPT_EXIT) break;
 
                 // send location to server
                 printf("Sharing location to %s\n", receiver);
@@ -410,7 +434,11 @@ int main(int argc, char** argv) {
                 req.opcode = SHARE_LOCATION;
                 req.length = buffSize;
                 req.data = buff;
-                request(socketfd, req, &res);
+                if(request(socketfd, req, &res) < 0) {
+                    printf("Connection lost\n");
+                    opt = IOPT_EXIT;
+                    break;
+                }
 
                 // receive response from server
                 printf("\n%s\n", (char*)res.data);
@@ -436,7 +464,11 @@ int main(int argc, char** argv) {
                     req.opcode = DELETE_LOCATIONS;
                     req.length = 0;
                     req.data = "";
-                    request(socketfd, req, &res);
+                    if(request(socketfd, req, &res) < 0) {
+                        printf("Connection lost\n");
+                        opt = IOPT_EXIT;
+                        break;
+                    }
 
                     if (res.status != SUCCESS) {
                         printf("\n%s\n", (char*)res.data);
@@ -453,7 +485,11 @@ int main(int argc, char** argv) {
                         req.opcode = SAVE_LOCATION;
                         req.length = rs * sizeof(Location);
                         req.data = locationArr;
-                        request(socketfd, req, &res);
+                        if(request(socketfd, req, &res) < 0) {
+                            printf("Connection lost\n");
+                            opt = IOPT_EXIT;
+                            break;
+                        }
 
                         //receive response from server
                         if (res.status != SUCCESS) {
@@ -463,6 +499,7 @@ int main(int argc, char** argv) {
                         }
                         free(res.data);
                     } while(rs > 0);
+                    if(opt == IOPT_EXIT) break;
                     printf(SAVE_LOCATION_SUCCESS);
                     opt = IOPT_MAINMENU;
                 }
@@ -489,7 +526,11 @@ int main(int argc, char** argv) {
                         req.opcode = GET_OWNED;
                         req.length = sizeof(int);
                         req.data = &currPage;
-                        request(socketfd, req, &res);
+                        if(request(socketfd, req, &res) < 0) {
+                            printf("Connection lost\n");
+                            opt = IOPT_EXIT;
+                            break;
+                        }
                         if (res.status == SUCCESS) {
                             locationNum = res.length / sizeof(Location);
                             if(locationNum == 0) break;
@@ -508,6 +549,7 @@ int main(int argc, char** argv) {
                         }
                         currPage++;
                     } while(1);
+                    if(opt == IOPT_EXIT) break;
                     printf(RESTORE_LOCATION_SUCCESS);
                 }
                 opt = IOPT_MAINMENU;
