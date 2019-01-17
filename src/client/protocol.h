@@ -55,13 +55,13 @@ typedef enum {
 	SIGNUP,
 	LOGIN,
 	LOGOUT,
-	SHARE_LOCATION,	//share to another user
-	SAVE_LOCATION,	//save location to server
-	GET_OWNED,		
-	GET_SHARED,
-	FETCH_UNSEEN,			//fetch new location when user log in
-	DELETE_LOCATIONS,
-	GET_USERS
+	SHARE_LOCATION,	               // share to another user
+	SAVE_LOCATION,	               //save location to server
+	GET_OWNED,	                   // get own locations (user who logged in)
+	GET_SHARED,                    // get location which shared by user
+	FETCH_UNSEEN,			       // fetch new location
+	DELETE_LOCATIONS,              // delete database on server
+	GET_USERS                      // get list online users
 } RequestOpcode;
 
 typedef enum {

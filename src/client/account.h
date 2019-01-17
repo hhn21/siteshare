@@ -15,7 +15,6 @@ typedef struct {
     char username[ACC_NAME_MAX_LEN];
     char password[ACC_NAME_MAX_LEN];
     int isActive;
-    int triedTime;
 } Account;
 
 /*
